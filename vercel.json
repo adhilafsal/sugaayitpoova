@@ -1,5 +1,0 @@
-﻿{
-  "rewrites": [
-    { "source": "/api/weather/:id", "destination": "/api/weather?id=:id" }
-  ]
-}
