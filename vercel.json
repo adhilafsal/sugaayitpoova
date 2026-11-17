@@ -27,6 +27,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/weather/:id", "destination": "/api/weather?id=:id" },
     { "source": "/images/places/Brahmatal.jpg", "destination": "/images/places/brahmatal.jpg" },
     { "source": "/images/places/Chikmagalur.jpg", "destination": "/images/places/chikmagalur.jpg" },
     { "source": "/images/places/Delhi.jpg", "destination": "/images/places/delhi.jpg" },

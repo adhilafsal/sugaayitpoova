@@ -247,7 +247,7 @@ body {
 .hero-overlay {
   min-height: 70vh;
   background: linear-gradient(rgba(7, 9, 14, 0.45), rgba(7, 9, 14, 0.85)),
-    url('images/places/kedarkantha.jpg') center/cover no-repeat;
+    url('/images/places/kedarkantha.jpg') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

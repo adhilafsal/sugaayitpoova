@@ -1,6 +1,7 @@
-const http = require('http');
+﻿const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const weatherHandler = require('./api/weather');
 
 const PORT = process.env.PORT || 8080;
 const BASE_DIR = __dirname;
@@ -28,7 +29,12 @@ const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
 
-  // If root requested, default to suggayitt povaa.html or index.html
+  // Handle weather API
+  if (pathname.startsWith('/api/weather')) {
+    return weatherHandler(req, res);
+  }
+
+  // If root requested, default to index.html or suggayitt povaa.html
   if (pathname === '/' || pathname === '/index.html') {
     if (fs.existsSync(path.join(BASE_DIR, 'index.html'))) {
       pathname = '/index.html';
