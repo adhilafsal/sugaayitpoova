@@ -1,0 +1,722 @@
+[
+  {
+    "id": "nirmal-purja",
+    "category": "mountaineers",
+    "name": "Nirmal Purja MBE (Nimsdai)",
+    "image": "images/discover/mountaineers/nirmal-purja.jpg",
+    "description": "Authentic portrait photograph of Nirmal Purja wearing summit gear.",
+    "source": "Wikimedia Commons",
+    "attribution": "Nirmal Purja / CC BY-SA 4.0",
+    "verified": true
+  },
+  {
+    "id": "tenzing-norgay",
+    "category": "mountaineers",
+    "name": "Tenzing Norgay Sherpa",
+    "image": "images/discover/mountaineers/tenzing-norgay.jpg",
+    "description": "Iconic authentic portrait photograph of Tenzing Norgay c. 1953.",
+    "source": "Wikimedia Commons / Public Domain",
+    "attribution": "Public Domain / Royal Geographical Society",
+    "verified": true
+  },
+  {
+    "id": "edmund-hillary",
+    "category": "mountaineers",
+    "name": "Sir Edmund Hillary",
+    "image": "images/discover/mountaineers/edmund-hillary.jpg",
+    "description": "Authentic portrait photograph of Sir Edmund Hillary in 1953.",
+    "source": "Wikimedia Commons / Library of New Zealand",
+    "attribution": "Public Domain / CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "reinhold-messner",
+    "category": "mountaineers",
+    "name": "Reinhold Messner",
+    "image": "images/discover/mountaineers/reinhold-messner.jpg",
+    "description": "Authentic photograph of legendary mountaineer Reinhold Messner.",
+    "source": "Wikimedia Commons",
+    "attribution": "Sven Mandel / CC BY-SA 4.0",
+    "verified": true
+  },
+  {
+    "id": "bachendri-pal",
+    "category": "mountaineers",
+    "name": "Bachendri Pal Padma Bhushan",
+    "image": "images/discover/mountaineers/bachendri-pal.jpg",
+    "description": "Authentic photograph of Bachendri Pal, first Indian woman on Everest.",
+    "source": "Wikimedia Commons",
+    "attribution": "President's Secretariat / Public Domain",
+    "verified": true
+  },
+  {
+    "id": "junko-tabei",
+    "category": "mountaineers",
+    "name": "Junko Tabei",
+    "image": "images/discover/mountaineers/junko-tabei.jpg",
+    "description": "Authentic portrait of Junko Tabei, first woman to reach the summit of Mount Everest.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA 4.0",
+    "verified": true
+  },
+  {
+    "id": "kami-rita",
+    "category": "mountaineers",
+    "name": "Kami Rita Sherpa",
+    "image": "images/discover/mountaineers/kami-rita.jpg",
+    "description": "Authentic photograph of Kami Rita Sherpa on the summit of Mount Everest.",
+    "source": "Wikimedia Commons",
+    "attribution": "Kami Rita Sherpa expedition archives / CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "ang-rita",
+    "category": "mountaineers",
+    "name": "Ang Rita Sherpa ('The Snow Leopard')",
+    "image": "images/discover/mountaineers/ang-rita.jpg",
+    "description": "Authentic portrait of Ang Rita Sherpa, 10x oxygenless Everest record holder.",
+    "source": "Wikimedia Commons",
+    "attribution": "Public Domain / Nepal Mountaineering Association",
+    "verified": true
+  },
+  {
+    "id": "nawang-gombu",
+    "category": "mountaineers",
+    "name": "Nawang Gombu Sherpa",
+    "image": "images/discover/mountaineers/nawang-gombu.jpg",
+    "description": "Authentic portrait of Nawang Gombu receiving National Adventure Award.",
+    "source": "Wikimedia Commons",
+    "attribution": "Photo Division, Government of India / Public Domain",
+    "verified": true
+  },
+  {
+    "id": "george-mallory",
+    "category": "mountaineers",
+    "name": "George Herbert Leigh Mallory",
+    "image": "images/discover/mountaineers/george-mallory.jpg",
+    "description": "Authentic portrait of George Mallory in 1915 before the 1924 British expedition.",
+    "source": "Wikimedia Commons / National Portrait Gallery",
+    "attribution": "Public Domain",
+    "verified": true
+  },
+  {
+    "id": "jerzy-kukuczka",
+    "category": "mountaineers",
+    "name": "Józef Jerzy Kukuczka",
+    "image": "images/discover/mountaineers/jerzy-kukuczka.jpg",
+    "description": "Authentic photograph of Jerzy Kukuczka on Mount Everest 1980.",
+    "source": "Wikimedia Commons",
+    "attribution": "Andrzej Zawada / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "alison-hargreaves",
+    "category": "mountaineers",
+    "name": "Alison Jane Hargreaves",
+    "image": "images/discover/mountaineers/alison-hargreaves.jpg",
+    "description": "Authentic historical photograph of Alison Hargreaves on Kangtega expedition.",
+    "source": "Wikimedia Commons",
+    "attribution": "Tom Frost / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "gerlinde-kaltenbrunner",
+    "category": "mountaineers",
+    "name": "Gerlinde Kaltenbrunner",
+    "image": "images/discover/mountaineers/gerlinde-kaltenbrunner.jpg",
+    "description": "Authentic portrait photograph of Gerlinde Kaltenbrunner, first woman to climb all 14 peaks without O2.",
+    "source": "Wikimedia Commons",
+    "attribution": "Manfred Werner / CC BY-SA 4.0",
+    "verified": true
+  },
+  {
+    "id": "everest",
+    "category": "fourteen_peaks",
+    "name": "Mount Everest (8,848.86m)",
+    "image": "images/discover/peaks/mount-everest.jpg",
+    "description": "Identifiable photograph of Mount Everest peak from Kala Patthar.",
+    "source": "Wikimedia Commons",
+    "attribution": "Luca Galuzzi / CC BY-SA 2.5",
+    "verified": true
+  },
+  {
+    "id": "k2",
+    "category": "fourteen_peaks",
+    "name": "K2 (8,611m)",
+    "image": "images/discover/peaks/k2.jpg",
+    "description": "Identifiable photograph of K2 Godwin-Austen pyramid from Concordia.",
+    "source": "Wikimedia Commons",
+    "attribution": "Kuno Lechner / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "kangchenjunga",
+    "category": "fourteen_peaks",
+    "name": "Kangchenjunga (8,586m)",
+    "image": "images/discover/peaks/kangchenjunga.jpg",
+    "description": "Identifiable photograph of the Five Treasures of Snow massif from Tiger Hill.",
+    "source": "Wikimedia Commons",
+    "attribution": "Joydeep / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "lhotse",
+    "category": "fourteen_peaks",
+    "name": "Lhotse (8,516m)",
+    "image": "images/discover/peaks/lhotse.jpg",
+    "description": "Identifiable photograph of the Lhotse South Face towering above Western Cwm.",
+    "source": "Wikimedia Commons",
+    "attribution": "Rupert Taylor-Price / CC BY-SA 2.0",
+    "verified": true
+  },
+  {
+    "id": "makalu",
+    "category": "fourteen_peaks",
+    "name": "Makalu (8,485m)",
+    "image": "images/discover/peaks/makalu.jpg",
+    "description": "Identifiable photograph of Makalu pyramid summit from Barun Valley.",
+    "source": "Wikimedia Commons",
+    "attribution": "Marek Novotny / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "cho-oyu",
+    "category": "fourteen_peaks",
+    "name": "Cho Oyu (8,188m)",
+    "image": "images/discover/peaks/cho-oyu.jpg",
+    "description": "Identifiable photograph of Cho Oyu Turquoise Goddess summit plateau.",
+    "source": "Wikimedia Commons",
+    "attribution": "Goran Bisić / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "dhaulagiri",
+    "category": "fourteen_peaks",
+    "name": "Dhaulagiri I (8,167m)",
+    "image": "images/discover/peaks/dhaulagiri.jpg",
+    "description": "Identifiable photograph of Dhaulagiri Dazzling White Mountain from Poon Hill.",
+    "source": "Wikimedia Commons",
+    "attribution": "Sergey Ashmarin / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "manaslu",
+    "category": "fourteen_peaks",
+    "name": "Manaslu (8,163m)",
+    "image": "images/discover/peaks/manaslu.jpg",
+    "description": "Identifiable photograph of Manaslu Mountain of the Spirit double peak.",
+    "source": "Wikimedia Commons",
+    "attribution": "Ben Tubby / CC BY 2.0",
+    "verified": true
+  },
+  {
+    "id": "nanga-parbat",
+    "category": "fourteen_peaks",
+    "name": "Nanga Parbat (8,126m)",
+    "image": "images/discover/peaks/nanga-parbat.jpg",
+    "description": "Identifiable photograph of Nanga Parbat Rupal Face, the highest mountain wall on Earth.",
+    "source": "Wikimedia Commons",
+    "attribution": "Guilhem Vellut / CC BY 2.0",
+    "verified": true
+  },
+  {
+    "id": "annapurna-1",
+    "category": "fourteen_peaks",
+    "name": "Annapurna I (8,091m)",
+    "image": "images/discover/peaks/annapurna-i.jpg",
+    "description": "Identifiable photograph of Annapurna I South Face from Base Camp.",
+    "source": "Wikimedia Commons",
+    "attribution": "Arite / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "gasherbrum-1",
+    "category": "fourteen_peaks",
+    "name": "Gasherbrum I (8,080m)",
+    "image": "images/discover/peaks/gasherbrum-i.jpg",
+    "description": "Identifiable photograph of Gasherbrum I Hidden Peak from Baltoro Glacier.",
+    "source": "Wikimedia Commons",
+    "attribution": "Kuno Lechner / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "broad-peak",
+    "category": "fourteen_peaks",
+    "name": "Broad Peak (8,051m)",
+    "image": "images/discover/peaks/broad-peak.jpg",
+    "description": "Identifiable photograph of Broad Peak triple summit crest in Karakoram.",
+    "source": "Wikimedia Commons",
+    "attribution": "Jens Bludau / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "gasherbrum-2",
+    "category": "fourteen_peaks",
+    "name": "Gasherbrum II (8,035m)",
+    "image": "images/discover/peaks/gasherbrum-ii.jpg",
+    "description": "Identifiable photograph of Gasherbrum II pyramid in the Gasherbrum group.",
+    "source": "Wikimedia Commons",
+    "attribution": "Wikimedia Commons / CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "shishapangma",
+    "category": "fourteen_peaks",
+    "name": "Shishapangma (8,027m)",
+    "image": "images/discover/peaks/shishapangma.jpg",
+    "description": "Identifiable photograph of Shishapangma north wall in Tibet.",
+    "source": "Wikimedia Commons",
+    "attribution": "Jörg Schulz / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "aconcagua",
+    "category": "seven_summits",
+    "name": "Aconcagua (South America, 6,961m)",
+    "image": "images/discover/peaks/aconcagua.jpg",
+    "description": "Identifiable photograph of Mount Aconcagua South Face in Argentina.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "denali",
+    "category": "seven_summits",
+    "name": "Denali (North America, 6,190m)",
+    "image": "images/discover/peaks/denali.jpg",
+    "description": "Identifiable photograph of Denali rising above Wonder Lake in Alaska.",
+    "source": "Wikimedia Commons / National Park Service",
+    "attribution": "Public Domain",
+    "verified": true
+  },
+  {
+    "id": "kilimanjaro",
+    "category": "seven_summits",
+    "name": "Kilimanjaro (Africa, 5,895m)",
+    "image": "images/discover/peaks/kilimanjaro.jpg",
+    "description": "Identifiable photograph of snow-capped Mount Kilimanjaro above the savannah.",
+    "source": "Wikimedia Commons",
+    "attribution": "Muhammad Mahdi Karim / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "elbrus",
+    "category": "seven_summits",
+    "name": "Mount Elbrus (Europe, 5,642m)",
+    "image": "images/discover/peaks/elbrus.jpg",
+    "description": "Identifiable photograph of Mount Elbrus twin volcanic cones in the Caucasus.",
+    "source": "Wikimedia Commons",
+    "attribution": "Juri / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "vinson",
+    "category": "seven_summits",
+    "name": "Vinson Massif (Antarctica, 4,892m)",
+    "image": "images/discover/peaks/vinson-massif.jpg",
+    "description": "Identifiable photograph of Vinson Massif in Sentinel Range, Antarctica.",
+    "source": "Wikimedia Commons / USGS",
+    "attribution": "Public Domain / USGS",
+    "verified": true
+  },
+  {
+    "id": "kosciuszko",
+    "category": "seven_summits",
+    "name": "Mount Kosciuszko (Australia - Bass List, 2,228m)",
+    "image": "images/discover/peaks/kosciuszko.jpg",
+    "description": "Identifiable photograph of Mount Kosciuszko summit in Snowy Mountains, Australia.",
+    "source": "Wikimedia Commons",
+    "attribution": "Mitch Ames / CC BY-SA 4.0",
+    "verified": true
+  },
+  {
+    "id": "carstensz",
+    "category": "seven_summits",
+    "name": "Puncak Jaya / Carstensz Pyramid (Oceania - Messner List, 4,884m)",
+    "image": "images/discover/peaks/carstensz-pyramid.jpg",
+    "description": "Identifiable photograph of Carstensz Pyramid limestone peak in Papua.",
+    "source": "Wikimedia Commons",
+    "attribution": "Alfindra Pradhana / CC BY-SA 3.0",
+    "verified": true
+  },
+  {
+    "id": "munnar",
+    "category": "historical_places",
+    "name": "Munnar",
+    "image": "images/discover/history/munnar.jpg",
+    "description": "Historic tea plantation hills founded during Duke of Wellington survey era.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "fort-kochi",
+    "category": "historical_places",
+    "name": "Fort Kochi",
+    "image": "images/discover/history/fort-kochi.jpg",
+    "description": "Historic Chinese fishing nets and colonial spice port settlement.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "bekal-fort",
+    "category": "historical_places",
+    "name": "Bekal Fort",
+    "image": "images/discover/history/bekal-fort.jpg",
+    "description": "17th-century coastal fortress built by Shivappa Nayaka in Kasaragod.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "wayanad",
+    "category": "historical_places",
+    "name": "Wayanad (Edakkal Caves)",
+    "image": "images/discover/history/wayanad.jpg",
+    "description": "Neolithic rock-cut petroglyphs and engravings inside Edakkal Caves.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "varkala",
+    "category": "historical_places",
+    "name": "Varkala (Janardhana Swamy)",
+    "image": "images/discover/history/varkala.jpg",
+    "description": "Ancient 2,000-year-old Papanasam beach and Janardhana Swamy temple cliff.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "mattancherry-palace",
+    "category": "historical_places",
+    "name": "Mattancherry Palace (Dutch Palace)",
+    "image": "images/discover/history/mattancherry-palace.jpg",
+    "description": "1555 CE palace gifted by Portuguese to Cochin Rajas with Ramayana murals.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "hampi",
+    "category": "historical_places",
+    "name": "Hampi (Vijayanagara Empire)",
+    "image": "images/discover/history/hampi.jpg",
+    "description": "Stone Chariot and Vittala Temple in the UNESCO World Heritage ruins of Vijayanagara.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "mysore-palace",
+    "category": "historical_places",
+    "name": "Mysore Palace (Amba Vilas)",
+    "image": "images/discover/history/mysore-palace.jpg",
+    "description": "Indo-Saracenic royal seat of the Wadiyar dynasty in Karnataka.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "badami",
+    "category": "historical_places",
+    "name": "Badami Cave Temples",
+    "image": "images/discover/history/badami.jpg",
+    "description": "6th-century rock-cut Chalukyan cave temples overlooking Agastya Lake.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "chikmagalur",
+    "category": "historical_places",
+    "name": "Chikmagalur",
+    "image": "images/discover/history/chikmagalur.jpg",
+    "description": "Babu Budan Giri hills where Sufi saint Baba Budan introduced coffee in 1670.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "ooty",
+    "category": "historical_places",
+    "name": "Ooty (Udhagamandalam)",
+    "image": "images/discover/history/ooty.jpg",
+    "description": "Nilgiri hill heritage founded by John Sullivan and native Toda lands.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "kodaikanal",
+    "category": "historical_places",
+    "name": "Kodaikanal",
+    "image": "images/discover/history/kodaikanal.jpg",
+    "description": "Princess of Hill Stations established by American missionaries in 1845.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "mahabalipuram",
+    "category": "historical_places",
+    "name": "Mahabalipuram (Mamallapuram)",
+    "image": "images/discover/history/mahabalipuram.jpg",
+    "description": "7th-century Pallava Shore Temple and monolithic rock-cut Rathas.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "madurai",
+    "category": "historical_places",
+    "name": "Madurai (Meenakshi Amman Temple)",
+    "image": "images/discover/history/madurai.jpg",
+    "description": "2,500-year-old Sangam capital and Meenakshi Sundareswarar temple towers.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "thanjavur",
+    "category": "historical_places",
+    "name": "Thanjavur (Brihadisvara Temple)",
+    "image": "images/discover/history/thanjavur.jpg",
+    "description": "1010 CE Great Living Chola Temple built by Emperor Raja Raja Chola I.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "jaipur",
+    "category": "historical_places",
+    "name": "Jaipur (Hawa Mahal)",
+    "image": "images/discover/history/jaipur.jpg",
+    "description": "Palace of Winds built in 1799 by Maharaja Sawai Pratap Singh in Jaipur.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "udaipur",
+    "category": "historical_places",
+    "name": "Udaipur (City Palace)",
+    "image": "images/discover/history/udaipur.jpg",
+    "description": "Majestic City Palace complex on Lake Pichola founded by Maharana Udai Singh II.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "jaisalmer-fort",
+    "category": "historical_places",
+    "name": "Jaisalmer Fort (Sonar Qila)",
+    "image": "images/discover/history/jaisalmer-fort.jpg",
+    "description": "1156 CE golden sandstone living fort founded by Rajput king Rawal Jaisal.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "chittorgarh-fort",
+    "category": "historical_places",
+    "name": "Chittorgarh Fort",
+    "image": "images/discover/history/chittorgarh-fort.jpg",
+    "description": "Largest fort in India and epic center of Mewar Rajput valor and Vijay Stambha.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "manali",
+    "category": "historical_places",
+    "name": "Manali (Hidimba Devi Temple)",
+    "image": "images/discover/history/manali.jpg",
+    "description": "1553 CE wooden pagoda temple of Hidimba Devi in Dhungri forest.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "shimla",
+    "category": "historical_places",
+    "name": "Shimla (Viceregal Lodge)",
+    "image": "images/discover/history/shimla.jpg",
+    "description": "Summer Capital of the British Raj and historic Viceregal Lodge (1888).",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "dharamshala",
+    "category": "historical_places",
+    "name": "Dharamshala & McLeod Ganj",
+    "image": "images/discover/history/dharamshala.jpg",
+    "description": "Tsuglagkhang Temple Complex and home of the 14th Dalai Lama in exile.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "spiti-valley",
+    "category": "historical_places",
+    "name": "Spiti Valley (Key Monastery)",
+    "image": "images/discover/history/spiti-valley.jpg",
+    "description": "11th-century fortress-like Key Gompa perched on a hill above Spiti River.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "srinagar",
+    "category": "historical_places",
+    "name": "Srinagar (Dal Lake & Shalimar Bagh)",
+    "image": "images/discover/history/srinagar.jpg",
+    "description": "Mughal Emperor Jahangir's Shalimar Bagh and historic Dal Lake shikaras.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "gulmarg",
+    "category": "historical_places",
+    "name": "Gulmarg",
+    "image": "images/discover/history/gulmarg.jpg",
+    "description": "Historic Meadow of Flowers named by Sultan Yusuf Shah in the 16th century.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "leh",
+    "category": "historical_places",
+    "name": "Leh (Leh Palace)",
+    "image": "images/discover/history/leh.jpg",
+    "description": "17th-century 9-storey royal citadel of King Sengge Namgyal in Ladakh.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "nubra-valley",
+    "category": "historical_places",
+    "name": "Nubra Valley (Diskit Monastery)",
+    "image": "images/discover/history/nubra-valley.jpg",
+    "description": "Historic Silk Route crossroads, Diskit Gompa and double-humped Bactrian camels.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "pangong-lake",
+    "category": "historical_places",
+    "name": "Pangong Tso",
+    "image": "images/discover/history/pangong-lake.jpg",
+    "description": "High-altitude endorheic salt lake in Changthang region of Ladakh.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "varanasi",
+    "category": "historical_places",
+    "name": "Varanasi (Kashi Ghats)",
+    "image": "images/discover/history/varanasi.jpg",
+    "description": "World's oldest living city and sacred Dashashwamedh Ghat on River Ganga.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "agra",
+    "category": "historical_places",
+    "name": "Agra (Taj Mahal)",
+    "image": "images/discover/history/agra.jpg",
+    "description": "White marble Mughal mausoleum commissioned by Shah Jahan in 1631 CE.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "delhi",
+    "category": "historical_places",
+    "name": "Delhi (Red Fort / Lal Qila)",
+    "image": "images/discover/history/delhi.jpg",
+    "description": "Historic red sandstone fortress built by Mughal Emperor Shah Jahan in 1648.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "qutub-minar",
+    "category": "historical_places",
+    "name": "Delhi (Qutub Minar)",
+    "image": "images/discover/history/qutub-minar.jpg",
+    "description": "72.5m fluted red sandstone victory minaret begun by Qutb ud-Din Aibak in 1199 CE.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "ajanta-caves",
+    "category": "historical_places",
+    "name": "Ajanta Caves",
+    "image": "images/discover/history/ajanta-caves.jpg",
+    "description": "30 rock-cut Buddhist cave monuments (2nd century BCE to 480 CE) with world-famous murals.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "ellora-caves",
+    "category": "historical_places",
+    "name": "Ellora Caves (Kailasa Temple)",
+    "image": "images/discover/history/ellora-caves.jpg",
+    "description": "Cave 16 Kailasa Temple, world's largest monolithic rock excavation carved top-down by Rashtrakutas.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "konark-sun-temple",
+    "category": "historical_places",
+    "name": "Konark Sun Temple",
+    "image": "images/discover/history/konark-sun-temple.jpg",
+    "description": "13th-century Sun God chariot temple with 24 carved stone sundial wheels in Odisha.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "meghalaya",
+    "category": "historical_places",
+    "name": "Meghalaya (Living Root Bridges)",
+    "image": "images/discover/history/meghalaya.jpg",
+    "description": "Centuries-old bio-engineering by indigenous Khasi and Jaintia tribes using Ficus elastica.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "darjeeling",
+    "category": "historical_places",
+    "name": "Darjeeling Himalayan Railway",
+    "image": "images/discover/history/darjeeling.jpg",
+    "description": "UNESCO World Heritage Toy Train (1881) and British colonial tea estates.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  },
+  {
+    "id": "sikkim",
+    "category": "historical_places",
+    "name": "Sikkim (Rumtek Monastery)",
+    "image": "images/discover/history/sikkim.jpg",
+    "description": "Dharmachakra Centre of the Karma Kagyu lineage in the former Himalayan Buddhist kingdom.",
+    "source": "Wikimedia Commons",
+    "attribution": "CC BY-SA",
+    "verified": true
+  }
+]

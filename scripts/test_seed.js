@@ -1,0 +1,12 @@
+﻿console.log('Step 1: starting');
+const { DatabaseSync } = require('node:sqlite');
+console.log('Step 2: loaded sqlite');
+const fs = require('node:fs');
+const db = new DatabaseSync('suggayitt.db');
+console.log('Step 3: opened db');
+const discoverScript = fs.readFileSync('discoverData.js', 'utf-8');
+console.log('Step 4: read file, size:', discoverScript.length);
+const fn = new Function(discoverScript + '; return discoverData;');
+console.log('Step 5: eval completed');
+const items = fn();
+console.log('Step 6: items count:', items.length);
