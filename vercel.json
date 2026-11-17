@@ -1,0 +1,52 @@
+﻿{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).(png|jpg|jpeg|webp|ico|svg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/images/places/Brahmatal.jpg", "destination": "/images/places/brahmatal.jpg" },
+    { "source": "/images/places/Chikmagalur.jpg", "destination": "/images/places/chikmagalur.jpg" },
+    { "source": "/images/places/Delhi.jpg", "destination": "/images/places/delhi.jpg" },
+    { "source": "/images/places/Hampta.jpg", "destination": "/images/places/hampta.jpg" },
+    { "source": "/images/places/Harihar.jpg", "destination": "/images/places/harihar.jpg" },
+    { "source": "/images/places/Hyderabad.jpg", "destination": "/images/places/hyderabad.jpg" },
+    { "source": "/images/places/Kashmir.jpg", "destination": "/images/places/kashmir.jpg" },
+    { "source": "/images/places/Kedarkantha.jpg", "destination": "/images/places/kedarkantha.jpg" },
+    { "source": "/images/places/Kolukkumalai.jpg", "destination": "/images/places/kolukkumalai.jpg" },
+    { "source": "/images/places/Kurishumala.jpg", "destination": "/images/places/kurishumala.jpg" },
+    { "source": "/images/places/Ladakh.jpg", "destination": "/images/places/ladakh.jpg" },
+    { "source": "/images/places/Manali.jpg", "destination": "/images/places/manali.jpg" },
+    { "source": "/images/places/Matheran.jpg", "destination": "/images/places/matheran.jpg" },
+    { "source": "/images/places/Meghalaya.jpg", "destination": "/images/places/meghalaya.jpg" },
+    { "source": "/images/places/Munnar.jpg", "destination": "/images/places/munnar.jpg" },
+    { "source": "/images/places/Mysore.jpg", "destination": "/images/places/mysore.jpg" },
+    { "source": "/images/places/Netravati.jpg", "destination": "/images/places/netravati.jpg" },
+    { "source": "/images/places/Paithalmala.jpg", "destination": "/images/places/paithalmala.jpg" },
+    { "source": "/images/places/Ramakkalmedu.jpg", "destination": "/images/places/ramakkalmedu.jpg" },
+    { "source": "/images/places/Spiti.jpg", "destination": "/images/places/spiti.jpg" },
+    { "source": "/images/places/Vattavada.jpg", "destination": "/images/places/vattavada.jpg" }
+  ]
+}
