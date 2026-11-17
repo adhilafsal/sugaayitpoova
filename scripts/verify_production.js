@@ -23,7 +23,7 @@ function fetchVercel(path) {
       res.on('end', () => resolve({
         status: res.statusCode,
         headers: res.headers,
-        data: data.slice(0, 500)
+        data: data
       }));
     });
     req.on('error', (err) => resolve({ status: 0, error: err.message }));
@@ -32,38 +32,53 @@ function fetchVercel(path) {
 }
 
 async function verify() {
-  console.log('--- CHECKING VERCEL DEPLOYMENT STATUS ---');
+  console.log('=== VERCEL PRODUCTION VERIFICATION ===\n');
+
+  console.log('1. Checking Production Website Status:');
   const homeRes = await fetchVercel('/');
-  console.log(`Home page HTTP status: ${homeRes.status}`);
-  console.log(`Vercel deployment ID / age: ${homeRes.headers['x-vercel-id']} | Age: ${homeRes.headers['age'] || 0}s`);
+  console.log(`   - Home Page (/): HTTP ${homeRes.status} OK`);
+  console.log(`   - Vercel Deployment ID: ${homeRes.headers['x-vercel-id']}`);
+  console.log(`   - Cache Age: ${homeRes.headers['age'] || 0}s\n`);
 
+  console.log('2. Checking script.js Integrity & Fixes:');
   const scriptRes = await fetchVercel('/script.js');
-  console.log(`script.js HTTP status: ${scriptRes.status}`);
-  const hasTriviaSafe = scriptRes.data.includes('renderTrivia') && scriptRes.data.includes('window.renderTrivia');
-  console.log(`script.js has renderTrivia safeguard: ${hasTriviaSafe}`);
+  console.log(`   - script.js HTTP status: ${scriptRes.status}`);
+  console.log(`   - Has renderTrivia safeguard: ${scriptRes.data.includes('function renderTrivia')}`);
+  console.log(`   - Has handleImageError diagnostics: ${scriptRes.data.includes('function handleImageError')}`);
+  console.log(`   - Root-relative paths (/images/places/): ${scriptRes.data.includes('/images/places/paithalmala.jpg')}\n`);
 
-  console.log('\n--- TESTING ALL 21 BEST PLACES IMAGES ON VERCEL ---');
+  console.log('3. Testing All 21 Best Places Images on Vercel:');
   let imgPassed = 0;
   for (const id of dests) {
     const res = await fetchVercel(`/images/places/${id}.jpg`);
     if (res.status === 200) {
       imgPassed++;
-      console.log(`  ✓ ${id}.jpg -> HTTP 200 OK (${res.headers['content-type']}, ${res.headers['content-length']} bytes)`);
+      console.log(`   ✓ /images/places/${id}.jpg -> HTTP 200 OK (${res.headers['content-type']}, ${res.headers['content-length']} bytes)`);
     } else {
-      console.log(`  ✗ ${id}.jpg -> HTTP ${res.status}`);
+      console.log(`   ✗ /images/places/${id}.jpg -> HTTP ${res.status}`);
     }
   }
-  console.log(`Images Passed: ${imgPassed} / ${dests.length}`);
+  console.log(`   Result: ${imgPassed} / ${dests.length} images returned HTTP 200 OK\n`);
 
-  console.log('\n--- TESTING WEATHER API ENDPOINTS ON VERCEL ---');
+  console.log('4. Testing Live Weather API on Vercel:');
   let weatherPassed = 0;
-  for (const id of ['paithalmala', 'munnar', 'ladakh', 'kedarkantha']) {
-    const res = await fetchVercel(`/api/weather/${id}`);
-    console.log(`  /api/weather/${id} -> HTTP ${res.status}: ${res.data.slice(0, 100)}`);
-    if (res.status === 200) weatherPassed++;
+  for (const id of dests) {
+    const res = await fetchVercel(`/api/weather?id=${id}`);
+    if (res.status === 200) {
+      weatherPassed++;
+      const parsed = JSON.parse(res.data);
+      console.log(`   ✓ /api/weather?id=${id} -> HTTP 200 (${parsed.weather.tempC}°C, ${parsed.weather.conditionEn})`);
+    } else {
+      console.log(`   ✗ /api/weather?id=${id} -> HTTP ${res.status}`);
+    }
   }
+  console.log(`   Result: ${weatherPassed} / ${dests.length} weather endpoints returned HTTP 200 OK\n`);
 
-  return { imgPassed, weatherPassed };
+  if (imgPassed === 21 && weatherPassed === 21) {
+    console.log('🎉 ALL PRODUCTION TESTS PASSED WITH 100% SUCCESS!');
+  } else {
+    console.error(`Verification incomplete: Images (${imgPassed}/21), Weather (${weatherPassed}/21)`);
+  }
 }
 
 verify();

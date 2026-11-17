@@ -737,7 +737,7 @@ function getWeatherBadgeHtml(placeId) {
 function fetchLiveWeather() {
   destinationsData.forEach(dest => {
     if (weatherCache[dest.id]) return;
-    fetch(`/api/weather/${dest.id}`)
+    fetch(`/api/weather?id=${encodeURIComponent(dest.id)}`)
       .then(res => {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();

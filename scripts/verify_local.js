@@ -18,7 +18,7 @@ function fetchStatus(urlPath) {
 }
 
 async function run() {
-  console.log('--- TESTING 21 DESTINATION IMAGES ---');
+  console.log('--- TESTING 21 DESTINATION IMAGES (LOCAL) ---');
   let imgErrors = 0;
   for (const id of dests) {
     const res = await fetchStatus(`/images/places/${id}.jpg`);
@@ -29,24 +29,24 @@ async function run() {
   }
   console.log(`Images verified: ${dests.length - imgErrors}/${dests.length} returned HTTP 200`);
 
-  console.log('\n--- TESTING 21 WEATHER API ENDPOINTS ---');
+  console.log('\n--- TESTING 21 WEATHER API ENDPOINTS (LOCAL) ---');
   let weatherErrors = 0;
   for (const id of dests) {
-    const res = await fetchStatus(`/api/weather/${id}`);
+    const res = await fetchStatus(`/api/weather?id=${id}`);
     if (res.status !== 200) {
-      console.error(`FAIL: /api/weather/${id} returned HTTP ${res.status}`);
+      console.error(`FAIL: /api/weather?id=${id} returned HTTP ${res.status}`);
       weatherErrors++;
     } else {
       const parsed = JSON.parse(res.data);
       if (!parsed.success || !parsed.weather) {
-        console.error(`FAIL: /api/weather/${id} invalid payload`);
+        console.error(`FAIL: /api/weather?id=${id} invalid payload`);
         weatherErrors++;
       }
     }
   }
   console.log(`Weather verified: ${dests.length - weatherErrors}/${dests.length} returned HTTP 200`);
 
-  console.log('\n--- TESTING SCRIPT.JS ---');
+  console.log('\n--- TESTING SCRIPT.JS (LOCAL) ---');
   const scriptRes = await fetchStatus('/script.js');
   console.log(`script.js HTTP status: ${scriptRes.status}`);
 
