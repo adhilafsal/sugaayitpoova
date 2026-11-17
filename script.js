@@ -1798,18 +1798,34 @@ document.addEventListener('keydown', (e) => {
 });
 
 
+
+// ==============================================================================
+// 5. USER PROFILE, CART & DATABASE SYNC (SUPABASE POWERED)
+// ==============================================================================
+
+const profileCache = {
+  cart: [],
+  savedPackages: [],
+  savedCourses: [],
+  bookedPackages: [],
+  currentCourses: [],
+  buyHistory: []
+};
+
+let isProfileSyncing = false;
+
 function getUserProfileStore() {
   const user = JSON.parse(localStorage.getItem('suggayittActiveUser') || 'null');
   if (!user) return null;
   const allData = JSON.parse(localStorage.getItem('suggayittProfileData') || '{}');
   if (!allData[user.email]) {
     allData[user.email] = {
-      cart: [],
-      savedPackages: [],
-      savedCourses: [],
-      bookedPackages: [],
-      currentCourses: [],
-      buyHistory: []
+      cart: profileCache.cart || [],
+      savedPackages: profileCache.savedPackages || [],
+      savedCourses: profileCache.savedCourses || [],
+      bookedPackages: profileCache.bookedPackages || [],
+      currentCourses: profileCache.currentCourses || [],
+      buyHistory: profileCache.buyHistory || []
     };
     localStorage.setItem('suggayittProfileData', JSON.stringify(allData));
   }
@@ -1817,11 +1833,73 @@ function getUserProfileStore() {
 }
 
 function saveUserProfileStore(storeObj) {
+  if (!storeObj || !storeObj.user) return;
   storeObj.allData[storeObj.user.email] = storeObj.data;
   localStorage.setItem('suggayittProfileData', JSON.stringify(storeObj.allData));
 }
 
-function toggleProfileItem(listKey, itemId, event) {
+async function syncProfileFromSupabase() {
+  const activeUser = JSON.parse(localStorage.getItem('suggayittActiveUser') || 'null');
+  if (!activeUser || !window.SuggayittDB) return;
+  const userId = activeUser.id;
+  if (!userId) return;
+
+  isProfileSyncing = true;
+  try {
+    const [packages, cart, courses, bookings, orders] = await Promise.all([
+      window.SuggayittDB.getSavedPackages(userId),
+      window.SuggayittDB.getCartItems(userId),
+      window.SuggayittDB.getSavedCourses(userId),
+      window.SuggayittDB.getBookingRequests(userId),
+      window.SuggayittDB.getOrderRequests(userId)
+    ]);
+
+    profileCache.savedPackages = (packages || []).map(p => p.package_id);
+    profileCache.cart = (cart || []).map(c => c.product_id);
+    profileCache.savedCourses = (courses || []).map(c => c.course_id);
+
+    profileCache.bookedPackages = (bookings || []).map(b => ({
+      id: b.id,
+      title: b.package_name,
+      amount: b.amount || '',
+      date: new Date(b.request_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      status: b.booking_status || 'Requested'
+    }));
+
+    profileCache.buyHistory = (orders || []).map(o => ({
+      id: o.id,
+      title: o.product_name,
+      amount: o.amount || '',
+      date: new Date(o.order_request_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      status: o.order_status || 'Requested'
+    }));
+
+    const allData = JSON.parse(localStorage.getItem('suggayittProfileData') || '{}');
+    allData[activeUser.email] = {
+      cart: profileCache.cart,
+      savedPackages: profileCache.savedPackages,
+      savedCourses: profileCache.savedCourses,
+      bookedPackages: profileCache.bookedPackages,
+      currentCourses: profileCache.currentCourses,
+      buyHistory: profileCache.buyHistory
+    };
+    localStorage.setItem('suggayittProfileData', JSON.stringify(allData));
+
+    renderPlaces();
+    renderPackages();
+    renderStore();
+    renderStudio();
+    if (!profilePageView.classList.contains('hidden')) {
+      renderProfileDashboard();
+    }
+  } catch (err) {
+    console.warn('[Supabase Sync Warning]:', err);
+  } finally {
+    isProfileSyncing = false;
+  }
+}
+
+async function toggleProfileItem(listKey, itemId, event) {
   if (event) event.stopPropagation();
   const storeObj = getUserProfileStore();
   if (!storeObj) {
@@ -1839,28 +1917,32 @@ function toggleProfileItem(listKey, itemId, event) {
   }
   saveUserProfileStore(storeObj);
 
-  // Sync with SQLite database
-  if (authToken) {
+  // Sync directly with Supabase
+  if (storeObj.user.id && window.SuggayittDB) {
     if (listKey === 'cart') {
+      const item = storeItemsData.find(g => g.id === itemId);
+      const name = item ? item.nameEn : itemId;
       if (adding) {
-        fetch('/api/cart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-          body: JSON.stringify({ itemId, quantity: 1 })
-        }).catch(() => { });
+        window.SuggayittDB.addToCart(storeObj.user.id, itemId, name, 1);
       } else {
-        fetch(`/api/cart/${itemId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        }).catch(() => { });
+        window.SuggayittDB.removeFromCart(storeObj.user.id, itemId);
       }
-    } else if (listKey === 'savedPackages' || listKey === 'savedCourses') {
-      const itemType = listKey === 'savedPackages' ? 'packages' : 'courses';
-      fetch('/api/saved', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-        body: JSON.stringify({ itemType, itemId })
-      }).catch(() => { });
+    } else if (listKey === 'savedPackages') {
+      const pkg = destinationsData.find(d => d.id === itemId);
+      const name = pkg ? pkg.nameEn : itemId;
+      if (adding) {
+        window.SuggayittDB.savePackage(storeObj.user.id, itemId, name);
+      } else {
+        window.SuggayittDB.removeSavedPackage(storeObj.user.id, itemId);
+      }
+    } else if (listKey === 'savedCourses') {
+      const course = coursesData.find(c => c.id === itemId);
+      const name = course ? course.nameEn : itemId;
+      if (adding) {
+        window.SuggayittDB.saveCourse(storeObj.user.id, itemId, name);
+      } else {
+        window.SuggayittDB.removeSavedCourse(storeObj.user.id, itemId);
+      }
     }
   }
 
@@ -1877,7 +1959,7 @@ function toggleProfileItem(listKey, itemId, event) {
   }
 }
 
-function recordUserBooking(category, itemTitle, priceOrCost) {
+async function recordUserBooking(category, itemTitle, priceOrCost) {
   const storeObj = getUserProfileStore();
   if (!storeObj) return;
 
@@ -1886,7 +1968,7 @@ function recordUserBooking(category, itemTitle, priceOrCost) {
     title: itemTitle,
     amount: priceOrCost,
     date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-    status: category === 'gear' ? 'Ordered' : (category === 'course' ? 'Enrolled' : 'Booked')
+    status: 'Requested'
   };
 
   if (category === 'place') storeObj.data.bookedPackages.unshift(entry);
@@ -1895,18 +1977,20 @@ function recordUserBooking(category, itemTitle, priceOrCost) {
 
   saveUserProfileStore(storeObj);
 
-  // Sync booking with SQLite database
-  if (authToken) {
-    fetch('/api/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-      body: JSON.stringify({
-        category,
-        itemId: activeDetailContext ? activeDetailContext.id : 'custom',
-        itemTitle,
-        priceOrCost
-      })
-    }).catch(err => console.warn('SQLite booking sync:', err));
+  // Sync request with Supabase
+  if (storeObj.user.id && window.SuggayittDB) {
+    const itemId = activeDetailContext ? activeDetailContext.id : 'custom';
+    if (category === 'place') {
+      window.SuggayittDB.createBookingRequest(storeObj.user.id, itemId, itemTitle, priceOrCost);
+    } else if (category === 'gear') {
+      window.SuggayittDB.createOrderRequest(storeObj.user.id, itemId, itemTitle, 1, priceOrCost);
+    } else if (category === 'course') {
+      window.SuggayittDB.createBookingRequest(storeObj.user.id, itemId, itemTitle, priceOrCost);
+    }
+  }
+
+  if (!profilePageView.classList.contains('hidden')) {
+    renderProfileDashboard();
   }
 }
 
@@ -1928,16 +2012,26 @@ function renderProfileDashboard() {
   if (!storeObj) return;
 
   const { user, data } = storeObj;
-  document.getElementById('profileAvatarInitial').textContent = user.name.charAt(0).toUpperCase();
-  document.getElementById('profileUserName').textContent = user.name;
-  document.getElementById('profileUserContact').textContent = `${user.email} • ${user.phone}`;
+  document.getElementById('profileAvatarInitial').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+  document.getElementById('profileUserName').textContent = user.name || 'Traveller';
+  const contactText = user.phone ? `${user.email} • ${user.phone}` : user.email;
+  document.getElementById('profileUserContact').textContent = contactText;
 
   const container = document.getElementById('profileTabContent');
+
+  if (isProfileSyncing && !data[currentProfileTab === 'history' ? 'bookedPackages' : (currentProfileTab === 'packages' ? 'savedPackages' : (currentProfileTab === 'courses' ? 'savedCourses' : 'cart'))].length) {
+    container.innerHTML = `
+      <div class="profile-loading-box">
+        <div class="profile-spinner"></div>
+        <p>${currentLang === 'ml' ? 'വിവരങ്ങൾ ഡാറ്റാബേസിൽ നിന്ന് ലോഡ് ചെയ്യുന്നു...' : 'Syncing data with Supabase...'}</p>
+      </div>`;
+    return;
+  }
 
   if (currentProfileTab === 'cart') {
     const items = storeItemsData.filter(g => data.cart.includes(g.id));
     if (!items.length) {
-      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'നിങ്ങളുടെ കാർട്ടിൽ ഗിയറുകളൊന്നും ചേർത്തിട്ടില്ല.' : 'Your gear cart is currently empty. Add items from the Store!'}</p><br><button type="button" class="btn-primary" onclick="openPage('store')">${currentLang === 'ml' ? 'സ്റ്റോറിലേക്ക് പോകുക' : 'Browse Adventure Store'}</button></div>`;
+      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'നിങ്ങളുടെ കാർട്ടിൽ ഗിയറുകളൊന്നുമില്ല.' : 'Your gear cart is currently empty. Add items from the Store!'}</p><br><button type="button" class="btn-primary" onclick="openPage('store')">${currentLang === 'ml' ? 'സ്റ്റോറിലേക്ക് പോകുക' : 'Browse Adventure Store'}</button></div>`;
       return;
     }
     container.innerHTML = `<div class="gears-grid">${items.map(item => `
@@ -1959,7 +2053,7 @@ function renderProfileDashboard() {
   } else if (currentProfileTab === 'packages') {
     const places = destinationsData.filter(p => data.savedPackages.includes(p.id));
     if (!places.length) {
-      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'സേവ് ചെയ്ത പാക്കേജുകളൊന്നും ഇല്ല.' : 'No saved packages yet. Save your dream treks to view them here!'}</p><br><button type="button" class="btn-primary" onclick="openPage('packages')">${currentLang === 'ml' ? 'പാക്കേജുകൾ കാണുക' : 'Explore Packages'}</button></div>`;
+      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'സേവ് ചെയ്ത പാക്കേജുകളൊന്നുമില്ല.' : 'No saved packages yet. Save your dream treks to view them here!'}</p><br><button type="button" class="btn-primary" onclick="openPage('packages')">${currentLang === 'ml' ? 'പാക്കേജുകൾ കാണുക' : 'Explore Packages'}</button></div>`;
       return;
     }
     container.innerHTML = `<div class="places-grid">${places.map(place => `
@@ -1978,7 +2072,7 @@ function renderProfileDashboard() {
   } else if (currentProfileTab === 'courses') {
     const courses = coursesData.filter(c => data.savedCourses.includes(c.id));
     if (!courses.length) {
-      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'സേവ് ചെയ്ത കോഴ്സുകളൊന്നും ഇല്ല.' : 'No saved courses yet. Save courses from Featured Editing & Shooting!'}</p><br><button type="button" class="btn-primary" onclick="openPage('studio')">${currentLang === 'ml' ? 'കോഴ്സുകൾ കാണുക' : 'Explore Courses'}</button></div>`;
+      container.innerHTML = `<div class="profile-empty-box"><p>${currentLang === 'ml' ? 'സേവ് ചെയ്ത കോഴ്സുകളൊന്നുമില്ല.' : 'No saved courses yet. Save courses from Featured Editing & Shooting!'}</p><br><button type="button" class="btn-primary" onclick="openPage('studio')">${currentLang === 'ml' ? 'കോഴ്സുകൾ കാണുക' : 'Explore Courses'}</button></div>`;
       return;
     }
     container.innerHTML = `<div class="gears-grid">${courses.map(c => `
@@ -1999,29 +2093,30 @@ function renderProfileDashboard() {
     `).join('')}</div>`;
   } else if (currentProfileTab === 'history') {
     const renderRows = (arr, emptyText) => arr.length
-      ? arr.map(r => `<div class="history-row"><div><strong>${r.title}</strong><div style="font-size:0.82rem;color:#cbd5e1;">${r.date} • ${r.amount}</div></div><span class="history-badge">${r.status}</span></div>`).join('')
+      ? arr.map(r => `<div class="history-row"><div><strong>${r.title}</strong><div style="font-size:0.82rem;color:#cbd5e1;">${r.date} • ${r.amount}</div></div><span class="history-badge ${r.status === 'Requested' ? 'requested' : 'confirmed'}">${r.status}</span></div>`).join('')
       : `<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:1rem;">${emptyText}</p>`;
 
     container.innerHTML = `
       <div class="history-section-group">
         <h3>${currentLang === 'ml' ? 'നിലവിലുള്ള കോഴ്സുകൾ (Current Courses)' : 'Current Courses'}</h3>
-        ${renderRows(data.currentCourses, currentLang === 'ml' ? 'നിലവിൽ കോഴ്സുകളൊന്നും ചേർന്നിട്ടില്ല.' : 'No active courses enrolled yet.')}
+        ${renderRows(data.currentCourses, currentLang === 'ml' ? 'നിലവിൽ കോഴ്സുകളിലൊന്നും ചേർന്നിട്ടില്ല.' : 'No active courses enrolled yet.')}
       </div>
       <div class="history-section-group">
-        <h3>${currentLang === 'ml' ? 'ബുക്ക് ചെയ്ത പാക്കേജുകൾ (Booked Packages)' : 'Booked Packages'}</h3>
-        ${renderRows(data.bookedPackages, currentLang === 'ml' ? 'ബുക്ക് ചെയ്ത പാക്കേജുകളൊന്നും ഇല്ല.' : 'No packages booked yet.')}
+        <h3>${currentLang === 'ml' ? 'ബുക്ക് ചെയ്ത പാക്കേജുകൾ (Booked / Requested Packages)' : 'Booked & Requested Packages'}</h3>
+        ${renderRows(data.bookedPackages, currentLang === 'ml' ? 'ബുക്ക് ചെയ്ത പാക്കേജുകളൊന്നുമില്ല.' : 'No package requests recorded yet.')}
       </div>
       <div class="history-section-group">
-        <h3>${currentLang === 'ml' ? 'വാങ്ങിയ ഗിയറുകൾ (Buy History)' : 'Buy History (Store Gears)'}</h3>
-        ${renderRows(data.buyHistory, currentLang === 'ml' ? 'ഇതുവരെ ഗിയറുകളൊന്നും വാങ്ങിയിട്ടില്ല.' : 'No gear purchases recorded yet.')}
+        <h3>${currentLang === 'ml' ? 'വാങ്ങിയ ഗിയറുകൾ (Buy History / Gear Orders)' : 'Buy History & Order Requests'}</h3>
+        ${renderRows(data.buyHistory, currentLang === 'ml' ? 'ഇതുവരെ ഗിയറുകളൊന്നും വാങ്ങിയിട്ടില്ല.' : 'No gear order requests recorded yet.')}
       </div>
     `;
   }
 }
 
-/* =========================================================
-   6. LOG IN & SIGN UP ENGINE
-   ========================================================= */
+// ==============================================================================
+// 6. LOG IN & SIGN UP ENGINE (SUPABASE AUTH POWERED)
+// ==============================================================================
+
 function openAuthModal(tab = 'login') {
   authModal.classList.remove('hidden');
   switchAuthTab(tab);
@@ -2040,16 +2135,30 @@ function closeAuthOnBackdrop(event) {
 
 function switchAuthTab(tab) {
   authFeedbackMsg.classList.add('hidden');
+  const loginF = document.getElementById('loginForm');
+  const signupF = document.getElementById('signupForm');
+  const forgotF = document.getElementById('forgotForm');
+  const updateF = document.getElementById('updatePasswordForm');
+  const tabLogin = document.getElementById('tabLoginBtn');
+  const tabSignup = document.getElementById('tabSignupBtn');
+
+  if (loginF) loginF.classList.add('hidden');
+  if (signupF) signupF.classList.add('hidden');
+  if (forgotF) forgotF.classList.add('hidden');
+  if (updateF) updateF.classList.add('hidden');
+  if (tabLogin) tabLogin.classList.remove('active');
+  if (tabSignup) tabSignup.classList.remove('active');
+
   if (tab === 'signup') {
-    loginForm.classList.add('hidden');
-    signupForm.classList.remove('hidden');
-    tabLoginBtn.classList.remove('active');
-    tabSignupBtn.classList.add('active');
+    if (signupF) signupF.classList.remove('hidden');
+    if (tabSignup) tabSignup.classList.add('active');
+  } else if (tab === 'forgot') {
+    if (forgotF) forgotF.classList.remove('hidden');
+  } else if (tab === 'update-password') {
+    if (updateF) updateF.classList.remove('hidden');
   } else {
-    signupForm.classList.add('hidden');
-    loginForm.classList.remove('hidden');
-    tabSignupBtn.classList.remove('active');
-    tabLoginBtn.classList.add('active');
+    if (loginF) loginF.classList.remove('hidden');
+    if (tabLogin) tabLogin.classList.add('active');
   }
 }
 
@@ -2059,46 +2168,6 @@ function showAuthFeedback(message, type) {
   authFeedbackMsg.classList.remove('hidden');
 }
 
-async function syncProfileFromDatabase() {
-  if (!authToken) return;
-  try {
-    const res = await fetch('/api/profile', {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    const data = await res.json();
-    if (data && data.success && data.profile) {
-      const activeUser = JSON.parse(localStorage.getItem('suggayittActiveUser') || 'null');
-      if (activeUser) {
-        const allData = JSON.parse(localStorage.getItem('suggayittProfileData') || '{}');
-        allData[activeUser.email] = {
-          cart: (data.profile.cart || []).map(c => c.item_id),
-          savedPackages: data.profile.savedPackages || [],
-          savedCourses: data.profile.savedCourses || [],
-          bookedPackages: (data.profile.bookings || []).filter(b => b.category === 'place').map(b => ({
-            id: b.id, title: b.item_title, amount: b.price_or_cost, date: b.booked_at, status: b.status
-          })),
-          currentCourses: (data.profile.bookings || []).filter(b => b.category === 'course').map(b => ({
-            id: b.id, title: b.item_title, amount: b.price_or_cost, date: b.booked_at, status: b.status
-          })),
-          buyHistory: (data.profile.bookings || []).filter(b => b.category === 'gear').map(b => ({
-            id: b.id, title: b.item_title, amount: b.price_or_cost, date: b.booked_at, status: b.status
-          }))
-        };
-        localStorage.setItem('suggayittProfileData', JSON.stringify(allData));
-        renderPlaces();
-        renderPackages();
-        renderStore();
-        renderStudio();
-        if (!profilePageView.classList.contains('hidden')) {
-          renderProfileDashboard();
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Profile sync notice:', err);
-  }
-}
-
 async function handleSignupSubmit(event) {
   event.preventDefault();
   const name = document.getElementById('signupName').value.trim();
@@ -2106,71 +2175,57 @@ async function handleSignupSubmit(event) {
   const email = document.getElementById('signupEmail').value.trim().toLowerCase();
   const password = document.getElementById('signupPassword').value;
 
-  try {
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, email, password })
-    });
-    const data = await res.json();
-    if (!data.success) {
-      showAuthFeedback(data.error || 'Signup failed', 'error');
+  showAuthFeedback(
+    currentLang === 'ml' ? 'അക്കൗണ്ട് സൃഷ്ടിക്കുന്നു...' : 'Creating your account...',
+    'info'
+  );
+
+  if (window.SuggayittDB) {
+    const { data, error } = await window.SuggayittDB.signUp(email, password, name, phone);
+    if (error) {
+      showAuthFeedback(error.message || 'Signup failed', 'error');
       return;
     }
 
-    authToken = data.token;
-    localStorage.setItem('suggayittAuthToken', data.token);
-    localStorage.setItem('suggayittActiveUser', JSON.stringify(data.user));
+    if (data && data.user) {
+      if (data.session) {
+        // Immediate session created
+        const activeUser = {
+          id: data.user.id,
+          name: name,
+          phone: phone,
+          email: email
+        };
+        localStorage.setItem('suggayittActiveUser', JSON.stringify(activeUser));
+        updateAuthNavbar();
+        syncProfileFromSupabase();
 
-    showAuthFeedback(
-      currentLang === 'ml'
-        ? `സ്വാഗതം ${name}! അക്കൗണ്ട് വിജയകരമായി നിർമ്മിച്ചു.`
-        : `Welcome ${name}! Your account has been created.`,
-      'success'
-    );
+        // Safe legacy data migration
+        window.SuggayittDB.migrateLegacyData(activeUser.id, activeUser.email, destinationsData, storeItemsData, coursesData);
 
-    signupForm.reset();
-    updateAuthNavbar();
-    renderPlaces();
-    renderPackages();
-    renderStore();
-    renderStudio();
-    setTimeout(closeAuthModal, 1000);
-  } catch (err) {
-    // Fallback to local storage
-    const users = JSON.parse(localStorage.getItem('suggayittUsers') || '[]');
-    const exists = users.some(u => u.email === email || u.phone === phone);
-
-    if (exists) {
-      showAuthFeedback(
-        currentLang === 'ml'
-          ? 'ഈ ഇമെയിൽ അല്ലെങ്കിൽ ഫോൺ നമ്പർ ഉപയോഗിച്ച് ഇതിനകം അക്കൗണ്ട് ഉണ്ട്.'
-          : 'An account with this email or mobile number already exists.',
-        'error'
-      );
+        showAuthFeedback(
+          currentLang === 'ml'
+            ? `സ്വാഗതം ${name}! അക്കൗണ്ട് വിജയകരമായി നിർമ്മിച്ചു.`
+            : `Welcome ${name}! Your account has been created.`,
+          'success'
+        );
+        document.getElementById('signupForm').reset();
+        setTimeout(closeAuthModal, 1200);
+      } else {
+        // Email verification required
+        showAuthFeedback(
+          currentLang === 'ml'
+            ? `അക്കൗണ്ട് സൃഷ്ടിച്ചു! ദയവായി നിങ്ങളുടെ ഇമെയിൽ പരിശോധിച്ചു സ്ഥിരീകരിക്കുക (${email}).`
+            : `Account created! Please check your email inbox to verify your account (${email}).`,
+          'success'
+        );
+        document.getElementById('signupForm').reset();
+      }
       return;
     }
-
-    const newUser = { name, phone, email, password };
-    users.push(newUser);
-    localStorage.setItem('suggayittUsers', JSON.stringify(users));
-    localStorage.setItem('suggayittActiveUser', JSON.stringify(newUser));
-
-    showAuthFeedback(
-      currentLang === 'ml'
-        ? `സ്വാഗതം ${name}! അക്കൗണ്ട് വിജയകരമായി നിർമ്മിച്ചു.`
-        : `Welcome ${name}! Your account has been created.`,
-      'success'
-    );
-
-    signupForm.reset();
-    updateAuthNavbar();
-    renderPlaces();
-    renderPackages();
-    renderStore();
-    renderStudio();
-    setTimeout(closeAuthModal, 1000);
   }
+
+  showAuthFeedback('Unable to connect to database. Please check your internet connection.', 'error');
 }
 
 async function handleLoginSubmit(event) {
@@ -2178,82 +2233,92 @@ async function handleLoginSubmit(event) {
   const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
 
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password })
-    });
-    const data = await res.json();
-    if (!data.success) {
-      showAuthFeedback(data.error || 'Invalid email/mobile number or password.', 'error');
+  showAuthFeedback(
+    currentLang === 'ml' ? 'പരിശോധിക്കുന്നു...' : 'Logging in...',
+    'info'
+  );
+
+  if (window.SuggayittDB) {
+    const { data, error } = await window.SuggayittDB.signIn(identifier, password);
+    if (error) {
+      let msg = error.message;
+      if (error.message.includes('Invalid login credentials')) {
+        msg = currentLang === 'ml'
+          ? 'തെറ്റായ ഇമെയിൽ അല്ലെങ്കിൽ പാസ്‌വേഡ്.'
+          : 'Invalid email or password.';
+      } else if (error.message.includes('Email not confirmed')) {
+        msg = currentLang === 'ml'
+          ? 'ഇമെയിൽ സ്ഥിരീകരിച്ചിട്ടില്ല. ദയവായി നിങ്ങളുടെ ഇൻബോക്സ് പരിശോധിക്കുക.'
+          : 'Email not confirmed yet. Please verify your email via the link sent to you.';
+      }
+      showAuthFeedback(msg, 'error');
       return;
     }
 
-    authToken = data.token;
-    localStorage.setItem('suggayittAuthToken', data.token);
-    localStorage.setItem('suggayittActiveUser', JSON.stringify(data.user));
+    if (data && data.session && data.user) {
+      const u = data.user;
+      let userName = u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0];
+      let userPhone = u.user_metadata?.phone || '';
 
-    syncProfileFromDatabase();
+      // Try fetching profile from profiles table
+      try {
+        const profile = await window.SuggayittDB.getProfile(u.id);
+        if (profile) {
+          if (profile.full_name) userName = profile.full_name;
+          if (profile.phone) userPhone = profile.phone;
+        }
+      } catch (e) { }
 
-    showAuthFeedback(
-      currentLang === 'ml'
-        ? `തിരികെ സ്വാഗതം, ${data.user.name}!`
-        : `Welcome back, ${data.user.name}!`,
-      'success'
-    );
+      const activeUser = {
+        id: u.id,
+        name: userName,
+        phone: userPhone,
+        email: u.email
+      };
 
-    loginForm.reset();
-    updateAuthNavbar();
-    renderPlaces();
-    renderPackages();
-    renderStore();
-    renderStudio();
-    setTimeout(closeAuthModal, 850);
-  } catch (err) {
-    const users = JSON.parse(localStorage.getItem('suggayittUsers') || '[]');
-    const matchedUser = users.find(
-      u => (u.email === identifier || u.phone === identifier) && u.password === password
-    );
+      localStorage.setItem('suggayittActiveUser', JSON.stringify(activeUser));
+      updateAuthNavbar();
+      syncProfileFromSupabase();
 
-    if (!matchedUser) {
+      // Safe legacy data migration
+      window.SuggayittDB.migrateLegacyData(activeUser.id, activeUser.email, destinationsData, storeItemsData, coursesData);
+
       showAuthFeedback(
         currentLang === 'ml'
-          ? 'തെറ്റായ ഇമെയിൽ/ഫോൺ നമ്പർ അല്ലെങ്കിൽ പാസ്‌വേഡ്.'
-          : 'Invalid email/mobile number or password.',
-        'error'
+          ? `തിരികെ സ്വാഗതം, ${userName}!`
+          : `Welcome back, ${userName}!`,
+        'success'
       );
+
+      document.getElementById('loginForm').reset();
+      renderPlaces();
+      renderPackages();
+      renderStore();
+      renderStudio();
+      setTimeout(closeAuthModal, 850);
       return;
     }
-
-    localStorage.setItem('suggayittActiveUser', JSON.stringify(matchedUser));
-    showAuthFeedback(
-      currentLang === 'ml'
-        ? `തിരികെ സ്വാഗതം, ${matchedUser.name}!`
-        : `Welcome back, ${matchedUser.name}!`,
-      'success'
-    );
-
-    loginForm.reset();
-    updateAuthNavbar();
-    renderPlaces();
-    renderPackages();
-    renderStore();
-    renderStudio();
-    setTimeout(closeAuthModal, 850);
   }
+
+  showAuthFeedback('Unable to connect to database. Please check your internet connection.', 'error');
 }
 
-function logoutUser() {
-  if (authToken) {
-    fetch('/api/auth/logout', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    }).catch(() => { });
+async function logoutUser() {
+  if (window.SuggayittDB) {
+    try {
+      await window.SuggayittDB.signOut();
+    } catch (e) {
+      console.warn('SignOut warning:', e);
+    }
   }
-  authToken = '';
-  localStorage.removeItem('suggayittAuthToken');
+
   localStorage.removeItem('suggayittActiveUser');
+  profileCache.cart = [];
+  profileCache.savedPackages = [];
+  profileCache.savedCourses = [];
+  profileCache.bookedPackages = [];
+  profileCache.buyHistory = [];
+
   updateAuthNavbar();
   renderPlaces();
   renderPackages();
@@ -2264,34 +2329,95 @@ function logoutUser() {
   }
 }
 
+async function handleForgotPasswordSubmit(event) {
+  event.preventDefault();
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+  showAuthFeedback(
+    currentLang === 'ml' ? 'ലിങ്ക് അയക്കുന്നു...' : 'Sending reset link...',
+    'info'
+  );
+
+  if (window.SuggayittDB) {
+    const { error } = await window.SuggayittDB.resetPasswordForEmail(email);
+    if (error) {
+      showAuthFeedback(error.message, 'error');
+      return;
+    }
+
+    showAuthFeedback(
+      currentLang === 'ml'
+        ? 'പാസ്‌വേഡ് റീസെറ്റ് ലിങ്ക് നിങ്ങളുടെ ഇമെയിലിലേക്ക് അയച്ചിട്ടുണ്ട്!'
+        : 'Password reset link has been sent to your email!',
+      'success'
+    );
+    document.getElementById('forgotForm').reset();
+  }
+}
+
+async function handleUpdatePasswordSubmit(event) {
+  event.preventDefault();
+  const newPassword = document.getElementById('newPasswordInput').value;
+
+  showAuthFeedback(
+    currentLang === 'ml' ? 'പാസ്‌വേഡ് മാറ്റുന്നു...' : 'Updating password...',
+    'info'
+  );
+
+  if (window.SuggayittDB) {
+    const { error } = await window.SuggayittDB.updatePassword(newPassword);
+    if (error) {
+      showAuthFeedback(error.message, 'error');
+      return;
+    }
+
+    showAuthFeedback(
+      currentLang === 'ml'
+        ? 'പാസ്‌വേഡ് വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു! ഇനി ലോഗിൻ ചെയ്യാം.'
+        : 'Password updated successfully! You can now log in.',
+      'success'
+    );
+    document.getElementById('updatePasswordForm').reset();
+    setTimeout(() => {
+      switchAuthTab('login');
+    }, 1500);
+  }
+}
+
 function updateAuthNavbar() {
   const activeUser = JSON.parse(localStorage.getItem('suggayittActiveUser') || 'null');
   if (activeUser) {
     authNavGroup.classList.add('hidden');
     userProfileGroup.classList.remove('hidden');
-    loggedInUserBadge.textContent = `👤 ${activeUser.name.split(' ')[0]} (Profile)`;
+    const firstName = activeUser.name ? activeUser.name.split(' ')[0] : 'Profile';
+    loggedInUserBadge.textContent = `👤 ${firstName} (Profile)`;
   } else {
     userProfileGroup.classList.add('hidden');
     authNavGroup.classList.remove('hidden');
   }
 }
 
-/* =========================================================
-   7. LANGUAGE SWITCHER & INITIALIZATION
-   ========================================================= */
+// ==============================================================================
+// 7. LANGUAGE SWITCHER & INITIALIZATION
+// ==============================================================================
+
 function applyLanguage(lang) {
   currentLang = lang;
   document.querySelectorAll('[data-en], [data-ml]').forEach(el => {
     el.textContent = lang === 'ml' ? el.getAttribute('data-ml') : el.getAttribute('data-en');
   });
 
-  placeSearchInput.placeholder = lang === 'ml'
-    ? placeSearchInput.getAttribute('data-placeholder-ml')
-    : placeSearchInput.getAttribute('data-placeholder-en');
+  if (typeof placeSearchInput !== 'undefined' && placeSearchInput) {
+    placeSearchInput.placeholder = lang === 'ml'
+      ? placeSearchInput.getAttribute('data-placeholder-ml')
+      : placeSearchInput.getAttribute('data-placeholder-en');
+  }
 
-  suggestionInput.placeholder = lang === 'ml'
-    ? suggestionInput.getAttribute('data-placeholder-ml')
-    : suggestionInput.getAttribute('data-placeholder-en');
+  if (typeof suggestionInput !== 'undefined' && suggestionInput) {
+    suggestionInput.placeholder = lang === 'ml'
+      ? suggestionInput.getAttribute('data-placeholder-ml')
+      : suggestionInput.getAttribute('data-placeholder-en');
+  }
 
   document.querySelectorAll('#authModal input[data-placeholder-en]').forEach(inp => {
     inp.placeholder = lang === 'ml'
@@ -2331,9 +2457,11 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-langSelect.addEventListener('change', (e) => {
-  applyLanguage(e.target.value);
-});
+if (typeof langSelect !== 'undefined' && langSelect) {
+  langSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+  });
+}
 
 async function syncCatalogFromAPI() {
   try {
@@ -2367,34 +2495,60 @@ async function syncCatalogFromAPI() {
     renderStore();
     renderStudio();
   } catch (err) {
-    console.warn('API sync fallback active:', err);
+    // Static catalogs remain default
   }
 }
 
 async function validateSession() {
-  if (!authToken) return;
+  if (!window.SuggayittDB) return;
+
   try {
-    const res = await fetch('/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    const data = await res.json();
-    if (data && data.success && data.user) {
-      localStorage.setItem('suggayittActiveUser', JSON.stringify(data.user));
-      syncProfileFromDatabase();
-    } else {
-      authToken = '';
-      localStorage.removeItem('suggayittAuthToken');
-      localStorage.removeItem('suggayittActiveUser');
+    const session = await window.SuggayittDB.getCurrentSession();
+    if (session && session.user) {
+      const u = session.user;
+      let userName = u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0];
+      let userPhone = u.user_metadata?.phone || '';
+
+      try {
+        const profile = await window.SuggayittDB.getProfile(u.id);
+        if (profile) {
+          if (profile.full_name) userName = profile.full_name;
+          if (profile.phone) userPhone = profile.phone;
+        }
+      } catch (e) { }
+
+      const activeUser = {
+        id: u.id,
+        name: userName,
+        phone: userPhone,
+        email: u.email
+      };
+
+      localStorage.setItem('suggayittActiveUser', JSON.stringify(activeUser));
       updateAuthNavbar();
+      syncProfileFromSupabase();
+    } else {
+      const cached = localStorage.getItem('suggayittActiveUser');
+      if (cached) {
+        localStorage.removeItem('suggayittActiveUser');
+        updateAuthNavbar();
+      }
     }
   } catch (err) {
-    console.warn('Session check fallback active:', err);
+    console.warn('[Session validation notice]:', err);
   }
 }
 
 function handleHashRouting() {
   const hash = (window.location.hash || '').replace('#', '');
   if (!hash) return;
+
+  // Handle password recovery link from Supabase
+  if (window.location.href.includes('type=recovery') || hash.includes('type=recovery')) {
+    openAuthModal('update-password');
+    return;
+  }
+
   if (hash === 'home') {
     showMainView('home');
   } else if (hash === 'best-places') {
@@ -2420,11 +2574,27 @@ window.addEventListener('hashchange', handleHashRouting);
 window.addEventListener('DOMContentLoaded', () => {
   populateSearchDatalist();
   const saved = localStorage.getItem('suggayittLang') || 'en';
-  langSelect.value = saved;
+  if (typeof langSelect !== 'undefined' && langSelect) {
+    langSelect.value = saved;
+  }
   applyLanguage(saved);
   syncCatalogFromAPI();
-  validateSession();
-  if (window.location.hash) {
+
+  // Initialize Supabase session and listener
+  if (window.SuggayittDB) {
+    validateSession();
+    window.SuggayittDB.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        openAuthModal('update-password');
+      } else if (event === 'SIGNED_IN') {
+        validateSession();
+      } else if (event === 'SIGNED_OUT') {
+        logoutUser();
+      }
+    });
+  }
+
+  if (window.location.hash || window.location.href.includes('type=recovery')) {
     handleHashRouting();
   }
 });

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>സുഗ്ഗായിട്ട് പോവാ | Suggayitt Povaa</title>
+  <link rel="icon" href="favicon.png?v=7" type="image/png">
+  <link rel="shortcut icon" href="favicon.png?v=7" type="image/png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&family=Montserrat:wght@400;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Liquid Glass Navbar -->
+  <header class="navbar">
+    <a href="#home" class="brand" onclick="showMainView('home')">
+      <img src="logo.png" alt="സുഗ്ഗായിട്ട് പോവാ Logo" class="nav-logo">
+      <div class="logo-text">
+        <span class="logo-ml">സുഗ്ഗായിട്ട് പോവാ</span>
+        <span class="logo-en">SUGGAYITT POVAA</span>
+      </div>
+    </a>
+
+    <!-- Search Bar for Places, Gears & Courses -->
+    <div class="search-wrapper">
+      <input type="text" id="placeSearchInput" list="placesDatalist" placeholder="Search place, gear, or course..."
+        data-placeholder-en="Search place, gear, or course..." data-placeholder-ml="സ്ഥലമോ ഗിയറോ കോഴ്സോ തിരയുക..."
+        autocomplete="off">
+      <datalist id="placesDatalist"></datalist>
+      <button id="placeSearchBtn" type="button" data-en="Search" data-ml="തിരയുക">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#home" id="nav-home" class="active-nav" onclick="showMainView('home')" data-en="Home"
+        data-ml="ഹോം">Home</a>
+      <a href="#best-places" id="nav-places" onclick="showMainView('best-places')" data-en="Best Places"
+        data-ml="മികച്ച സ്ഥലങ്ങൾ">Best Places</a>
+      <a href="#store" id="nav-store" onclick="openPage('store'); return false;" data-en="Store"
+        data-ml="സ്റ്റോർ">Store</a>
+      <a href="#packages" id="nav-packages" onclick="openPage('packages'); return false;" data-en="Packages"
+        data-ml="പാക്കേജുകൾ">Packages</a>
+      <a href="#studio" id="nav-studio" onclick="openPage('studio'); return false;"
+        data-en="Featured Editing & Shooting" data-ml="എഡിറ്റിംഗ് & ഷൂട്ടിംഗ്">Featured Editing & Shooting</a>
+      <a href="#discover" id="nav-discover" onclick="openPage('discover'); return false;" data-en="Discover & Learn"
+        data-ml="അറിയാം, പഠിക്കാം">Discover & Learn</a>
+      <a href="#about" id="nav-about" onclick="showMainView('about')" data-en="About Us"
+        data-ml="ഞങ്ങളെക്കുറിച്ച്">About Us</a>
+
+      <!-- Auth Buttons (Logged Out) -->
+      <div id="authNavGroup" class="auth-nav-group">
+        <span class="db-sync-badge" title="SQLite Database Connected">⚡ SQLite Sync</span>
+        <button type="button" class="btn-auth-login" onclick="openAuthModal('login')" data-en="Log In"
+          data-ml="ലോഗിൻ">Log In</button>
+        <button type="button" class="btn-auth-signup" onclick="openAuthModal('signup')" data-en="Sign Up"
+          data-ml="സൈൻ അപ്പ്">Sign Up</button>
+      </div>
+
+      <!-- User Profile Pill (Logged In - Click to Open 4-Tab Profile Dashboard) -->
+      <div id="userProfileGroup" class="user-profile-group hidden">
+        <button type="button" id="loggedInUserBadge" class="user-badge" onclick="openPage('profile')"></button>
+        <button type="button" class="btn-auth-logout" onclick="logoutUser()" data-en="Logout"
+          data-ml="ലോഗൗട്ട്">Logout</button>
+      </div>
+
+      <select id="langSelect" aria-label="Language Selector">
+        <option value="en">English</option>
+        <option value="ml">മലയാളം</option>
+      </select>
+    </nav>
+  </header>
+
+  <!-- LOG IN & SIGN UP LIQUID GLASS MODAL -->
+  <div id="authModal" class="auth-modal-backdrop hidden" onclick="closeAuthOnBackdrop(event)">
+    <div class="auth-glass-card">
+      <button type="button" class="auth-close-btn" onclick="closeAuthModal()" aria-label="Close">×</button>
+
+      <div class="auth-header">
+        <img src="logo.png" alt="Suggayitt Povaa" class="auth-modal-logo">
+        <div class="auth-tabs">
+          <button type="button" id="tabLoginBtn" class="auth-tab active" onclick="switchAuthTab('login')"
+            data-en="Log In" data-ml="ലോഗിൻ">Log In</button>
+          <button type="button" id="tabSignupBtn" class="auth-tab" onclick="switchAuthTab('signup')" data-en="Sign Up"
+            data-ml="സൈൻ അപ്പ്">Sign Up</button>
+        </div>
+      </div>
+
+      <p id="authFeedbackMsg" class="auth-feedback hidden"></p>
+
+      <!-- LOG IN FORM -->
+      <form id="loginForm" class="auth-form" onsubmit="handleLoginSubmit(event)">
+        <h3 data-en="Welcome Back, Traveller!" data-ml="വീണ്ടും സ്വാഗതം, യാത്രികാ!">Welcome Back, Traveller!</h3>
+        <p class="auth-sub" data-en="Log in to manage your trek bookings and gear orders."
+          data-ml="നിങ്ങളുടെ യാത്രകളും ഓർഡറുകളും പരിശോധിക്കാൻ ലോഗിൻ ചെയ്യുക.">
+          Log in to manage your trek bookings and gear orders.
+        </p>
+
+        <label data-en="Email or Phone Number" data-ml="ഇമെയിൽ അല്ലെങ്കിൽ ഫോൺ നമ്പർ">Email or Phone Number</label>
+        <input type="text" id="loginIdentifier" required placeholder="Enter email or 10-digit mobile"
+          data-placeholder-en="Enter email or 10-digit mobile" data-placeholder-ml="ഇമെയിൽ അല്ലെങ്കിൽ ഫോൺ നമ്പർ നൽകുക">
+
+        <label data-en="Password" data-ml="പാസ്‌വേഡ്">Password</label>
+        <input type="password" id="loginPassword" required placeholder="Enter your password"
+          data-placeholder-en="Enter your password" data-placeholder-ml="നിങ്ങളുടെ പാസ്‌വേഡ് നൽകുക">
+        <div style="display:flex; justify-content:flex-end; margin-top:-0.4rem; margin-bottom:0.9rem;">
+          <a href="#" onclick="switchAuthTab('forgot'); return false;" class="auth-forgot-link" data-en="Forgot password?" data-ml="പാസ്‌വേഡ് മറന്നുപോയോ?">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Log In Now" data-ml="ലോഗിൻ ചെയ്യുക">Log In
+          Now</button>
+
+        <p class="auth-switch-hint">
+          <span data-en="Don't have an account?" data-ml="അക്കൗണ്ട് ഇല്ലേ?">Don't have an account?</span>
+          <a href="#" onclick="switchAuthTab('signup'); return false;" data-en="Create one here"
+            data-ml="ഇവിടെ സൈൻ അപ്പ് ചെയ്യുക">Create one here</a>
+        </p>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signupForm" class="auth-form hidden" onsubmit="handleSignupSubmit(event)">
+        <h3 data-en="Join Suggayitt Povaa" data-ml="സുഗ്ഗായിട്ട് പോവാ കുടുംബത്തിലേക്ക് സ്വാഗതം">Join Suggayitt Povaa
+        </h3>
+        <p class="auth-sub" data-en="Create your free account for fast trip & store enquiries."
+          data-ml="വേഗത്തിലുള്ള ബുക്കിംഗിനായി സൗജന്യ അക്കൗണ്ട് തുടങ്ങുക.">
+          Create your free account for fast trip & store enquiries.
+        </p>
+
+        <label data-en="Full Name" data-ml="പൂർണ്ണ പേര്">Full Name</label>
+        <input type="text" id="signupName" required placeholder="Enter your full name"
+          data-placeholder-en="Enter your full name" data-placeholder-ml="നിങ്ങളുടെ പേര് നൽകുക">
+
+        <label data-en="Mobile Number (WhatsApp)" data-ml="മൊബൈൽ നമ്പർ (വാട്സാപ്പ്)">Mobile Number (WhatsApp)</label>
+        <input type="tel" id="signupPhone" required placeholder="e.g. 9876543210" data-placeholder-en="e.g. 9876543210"
+          data-placeholder-ml="ഉദാ: 9876543210">
+
+        <label data-en="Email Address" data-ml="ഇമെയിൽ വിലാസം">Email Address</label>
+        <input type="email" id="signupEmail" required placeholder="you@example.com"
+          data-placeholder-en="you@example.com" data-placeholder-ml="നിങ്ങളുടെ ഇമെയിൽ നൽകുക">
+
+        <label data-en="Create Password" data-ml="പുതിയ പാസ്‌വേഡ്">Create Password</label>
+        <input type="password" id="signupPassword" minlength="6" required placeholder="Minimum 6 characters"
+          data-placeholder-en="Minimum 6 characters" data-placeholder-ml="കുറഞ്ഞത് 6 അക്ഷരങ്ങൾ">
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Create Account"
+          data-ml="അക്കൗണ്ട് തുടങ്ങുക">Create Account</button>
+
+        <p class="auth-switch-hint">
+          <span data-en="Already have an account?" data-ml="ഇതിനകം അക്കൗണ്ട് ഉണ്ടോ?">Already have an account?</span>
+          <a href="#" onclick="switchAuthTab('login'); return false;" data-en="Log In here"
+            data-ml="ഇവിടെ ലോഗിൻ ചെയ്യുക">Log In here</a>
+        </p>
+      </form>
+      <!-- FORGOT PASSWORD FORM -->
+      <form id="forgotForm" class="auth-form hidden" onsubmit="handleForgotPasswordSubmit(event)">
+        <h3 data-en="Reset Password" data-ml="പാസ്‌വേഡ് റീസെറ്റ് ചെയ്യുക">Reset Password</h3>
+        <p class="auth-sub" data-en="Enter your registered email and we'll send you a password reset link."
+          data-ml="നിങ്ങളുടെ ഇമെയിൽ നൽകുക, പാസ്‌വേഡ് മാറ്റാനുള്ള ലിങ്ക് ഞങ്ങൾ അയച്ചുതരാം.">
+          Enter your registered email and we'll send you a password reset link.
+        </p>
+
+        <label data-en="Email Address" data-ml="ഇമെയിൽ വിലാസം">Email Address</label>
+        <input type="email" id="forgotEmail" required placeholder="you@example.com"
+          data-placeholder-en="you@example.com" data-placeholder-ml="നിങ്ങളുടെ ഇമെയിൽ നൽകുക">
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Send Reset Link"
+          data-ml="റീസെറ്റ് ലിങ്ക് അയക്കുക">Send Reset Link</button>
+
+        <p class="auth-switch-hint">
+          <a href="#" onclick="switchAuthTab('login'); return false;" data-en="← Back to Log In"
+            data-ml="← ലോഗിനിലേക്ക് മടങ്ങുക">← Back to Log In</a>
+        </p>
+      </form>
+
+      <!-- UPDATE PASSWORD FORM (RECOVERY) -->
+      <form id="updatePasswordForm" class="auth-form hidden" onsubmit="handleUpdatePasswordSubmit(event)">
+        <h3 data-en="Set New Password" data-ml="പുതിയ പാസ്‌വേഡ് നൽകുക">Set New Password</h3>
+        <p class="auth-sub" data-en="Enter your new secure password below."
+          data-ml="നിങ്ങളുടെ പുതിയ പാസ്‌വേഡ് താഴെ നൽകുക.">
+          Enter your new secure password below.
+        </p>
+
+        <label data-en="New Password" data-ml="പുതിയ പാസ്‌വേഡ്">New Password</label>
+        <input type="password" id="newPasswordInput" minlength="6" required placeholder="Minimum 6 characters"
+          data-placeholder-en="Minimum 6 characters" data-placeholder-ml="കുറഞ്ഞത് 6 അക്ഷരങ്ങൾ">
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Save New Password"
+          data-ml="പുതിയ പാസ്‌വേഡ് സേവ് ചെയ്യുക">Save New Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN PAGE VIEW -->
+  <main id="mainPageView">
+    <!-- 1. HOME SECTION -->
+    <section id="home" class="hero-section">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1 data-en="Travel Freely. Find Your Peace." data-ml="സുഗ്ഗായിട്ട് പോവാം, മനസ്സമാധാനം കണ്ടെത്താം.">
+            Travel Freely. Find Your Peace.
+          </h1>
+          <p class="hero-sub"
+            data-en="Budget-friendly treks, mountain expeditions, and soulful journeys starting from Kerala."
+            data-ml="കേരളത്തിൽ നിന്നും ബജറ്റ് സൗഹൃദ ട്രെക്കിംഗുകളും ഹിമാലയൻ യാത്രകളും.">
+            Budget-friendly treks, mountain expeditions, and soulful journeys starting from Kerala.
+          </p>
+          <div class="hero-btns">
+            <a href="#best-places" class="btn-primary" data-en="Explore Places" data-ml="സ്ഥലങ്ങൾ കാണുക">Explore
+              Places</a>
+            <button type="button" class="btn-outline" onclick="openPage('packages')" data-en="View All Packages"
+              data-ml="എല്ലാ പാക്കേജുകളും">View All Packages</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quotes & Peace Article -->
+      <div class="container home-article-wrap">
+        <div class="quotes-grid">
+          <blockquote class="quote-card">
+            <p data-en="“Life is either a daring adventure or nothing at all.”"
+              data-ml="“ജീവിതം ഒന്നുകിൽ ധീരമായൊരു സാഹസികതയാണ്, അല്ലെങ്കിൽ ഒന്നുമല്ല.”">
+              “Life is either a daring adventure or nothing at all.”
+            </p>
+            <span>— Helen Keller</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“To travel is to live.”" data-ml="“യാത്ര ചെയ്യുക എന്നതാണ് യഥാർത്ഥ ജീവിതം.”">
+              “To travel is to live.”
+            </p>
+            <span>— Hans Christian Andersen</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Twenty years from now you will be more disappointed by the things you didn't do...”"
+              data-ml="“ഇരുപത് വർഷങ്ങൾക്ക് ശേഷം, നിങ്ങൾ ചെയ്ത കാര്യങ്ങളെക്കാൾ ചെയ്യാതെ പോയ കാര്യങ്ങളെയോർത്തായിരിക്കും കൂടുതൽ നിരാശപ്പെടുക...”">
+              “Twenty years from now you will be more disappointed by the things you didn't do...”
+            </p>
+            <span>— Mark Twain</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“We travel not to escape life, but for life not to escape us.”"
+              data-ml="“നമ്മൾ യാത്ര ചെയ്യുന്നത് ജീവിതത്തിൽ നിന്ന് ഒളിച്ചോടാനല്ല, മറിച്ച് ജീവിതം നമ്മളിൽ നിന്ന് നഷ്ടപ്പെടാതിരിക്കാനാണ്.”">
+              “We travel not to escape life, but for life not to escape us.”
+            </p>
+            <span>— Unknown</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Go. See. Do.”" data-ml="“പോകുക. കാണുക. അനുഭവിക്കുക.”">
+              “Go. See. Do.”
+            </p>
+            <span>— Travel Mantra</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Wander often, wonder always.”" data-ml="“പലപ്പോഴും അലഞ്ഞുതിരിയുക, എപ്പോഴും വിസ്മയിക്കുക.”">
+              “Wander often, wonder always.”
+            </p>
+            <span>— Travel Mantra</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Take only memories, leave only footprints.”"
+              data-ml="“ഓർമ്മകൾ മാത്രം കൂടെ കൂട്ടുക, കാൽപ്പാടുകൾ മാത്രം ബാക്കിയാക്കുക.”">
+              “Take only memories, leave only footprints.”
+            </p>
+            <span>— Chief Seattle</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Not all those who wander are lost.”" data-ml="“അലഞ്ഞുതിരിയുന്നവരെല്ലാം വഴിതെറ്റിയവരല്ല.”">
+              “Not all those who wander are lost.”
+            </p>
+            <span>— J.R.R. Tolkien</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Travel far enough, you meet yourself.”"
+              data-ml="“ദൂരേക്ക് യാത്ര ചെയ്യൂ, അവിടെ നിങ്ങൾ നിങ്ങളെത്തന്നെ കണ്ടെത്തും.”">
+              “Travel far enough, you meet yourself.”
+            </p>
+            <span>— David Mitchell</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“Traveling – it leaves you speechless, then turns you into a storyteller.”"
+              data-ml="“യാത്രകൾ ആദ്യം നിങ്ങളെ നിശ്ശബ്ദരാക്കും, പിന്നീട് ഒരു കഥാകാരനാക്കി മാറ്റും.”">
+              “Traveling – it leaves you speechless, then turns you into a storyteller.”
+            </p>
+            <span>— Ibn Battuta</span>
+          </blockquote>
+
+          <blockquote class="quote-card">
+            <p data-en="“One's destination is never a place, but a new way of seeing things.”"
+              data-ml="“ഒരാളുടെ ലക്ഷ്യസ്ഥാനം ഒരിക്കലും ഒരു സ്ഥലമല്ല, മറിച്ച് കാര്യങ്ങളെ കാണാനുള്ള പുതിയൊരു കാഴ്ചപ്പാടാണ്.”">
+              “One's destination is never a place, but a new way of seeing things.”
+            </p>
+            <span>— Henry Miller</span>
+          </blockquote>
+        </div>
+
+        <article class="peace-article">
+          <h2 data-en="How Travelling Brings True Inner Peace" data-ml="യാത്രകൾ എങ്ങനെ മനസ്സമാധാനം നൽകുന്നു?">
+            How Travelling Brings True Inner Peace
+          </h2>
+
+          <p data-en="In a fast-paced world filled with endless notifications, tight deadlines, and daily routines, finding a moment of genuine stillness can feel nearly impossible. We often search for calm inside self-help books or meditation apps, yet one of the most powerful gateways to tranquility lies right beyond our front door. Travelling is far more than a temporary escape or a collection of photographs; when approached with intention, it acts as a profound reset button for the mind, body, and soul."
+            data-ml="അവസാനിക്കാത്ത നോട്ടിഫിക്കേഷനുകളും തിരക്കുകളും ദിനചര്യകളും നിറഞ്ഞ ഈ വേഗതയേറിയ ലോകത്ത്, യഥാർത്ഥ ശാന്തത കണ്ടെത്തുക എന്നത് അസാധ്യമാണെന്ന് തോന്നാം. നമ്മൾ പലപ്പോഴും പുസ്തകങ്ങളിലും മെഡിറ്റേഷൻ ആപ്പുകളിലും സമാധാനം തേടാറുണ്ട്, എന്നാൽ മനസ്സമാധാനത്തിലേക്കുള്ള ഏറ്റവും ശക്തമായ വഴി നമ്മുടെ വീടിന്റെ പടിവാതിൽക്കൽ തന്നെയുണ്ട്. യാത്ര എന്നത് വെറുമൊരു താൽക്കാലിക ഒളിച്ചോട്ടമോ ഫോട്ടോകളുടെ ശേഖരമോ അല്ല; ശരിയായ ലക്ഷ്യത്തോടെ സമീപിക്കുമ്പോൾ അത് മനസ്സിനും ശരീരത്തിനും ആത്മാവിനും ഒരു പുത്തൻ ഉണർവ് നൽകുന്നു.">
+            In a fast-paced world filled with endless notifications, tight deadlines, and daily routines, finding a
+            moment of genuine stillness can feel nearly impossible. We often search for calm inside self-help books or
+            meditation apps, yet one of the most powerful gateways to tranquility lies right beyond our front door.
+            Travelling is far more than a temporary escape or a collection of photographs; when approached with
+            intention, it acts as a profound reset button for the mind, body, and soul.
+          </p>
+
+          <h3 data-en="Breaking Free from the Noise of Routine" data-ml="ദിനചര്യകളുടെ ബഹളങ്ങളിൽ നിന്നുള്ള മോചനം">
+            Breaking Free from the Noise of Routine
+          </h3>
+          <p data-en="Daily life has a subtle way of trapping us on autopilot. Waking up to the same alarm, commuting along familiar streets, and answering the same emails create a mental fog that disconnects us from our deeper selves. Stepping into an unfamiliar environment immediately interrupts this cycle. Whether you are wandering through quiet mountain trails, listening to ocean waves, or exploring the cobbled alleys of a distant town, new surroundings gently pull your attention outward. As the noise of everyday obligations fades into the background, your mind finally gains the space it needs to breathe, reflect, and settle into stillness."
+            data-ml="ദൈനംദിന ജീവിതം നമ്മളെ ഒരു യന്ത്രത്തെപ്പോലെ ഒരേ കാര്യങ്ങൾ ആവർത്തിക്കാൻ പ്രേരിപ്പിക്കുന്നു. ഒരേ അലാറം കേട്ട് ഉണരുന്നതും പരിചിതമായ വഴികളിലൂടെ യാത്ര ചെയ്യുന്നതും നമ്മുടെ മനസ്സിനെ മടുപ്പിക്കുന്നു. അപരിചിതമായ ഒരു അന്തരീക്ഷത്തിലേക്ക് കാലെടുത്തുവെക്കുന്നത് ഈ വിരസതയെ ഉടൻ ഇല്ലാതാക്കുന്നു. ശാന്തമായ മലമ്പാതകളിലൂടെ നടക്കുമ്പോഴോ തിരമാലകളുടെ ശബ്ദം കേൾക്കുമ്പോഴോ പുതിയ ചുറ്റുപാടുകൾ നമ്മുടെ ശ്രദ്ധയെ പുറത്തേക്ക് തിരിക്കുന്നു. ദൈനംദിന കടമകളുടെ ബഹളങ്ങൾ മറയുമ്പോൾ, മനസ്സിന് ശ്വസിക്കാനും ചിന്തിക്കാനും ശാന്തമാകാനും ഇടം ലഭിക്കുന്നു.">
+            Daily life has a subtle way of trapping us on autopilot. Waking up to the same alarm, commuting along
+            familiar streets, and answering the same emails create a mental fog that disconnects us from our deeper
+            selves. Stepping into an unfamiliar environment immediately interrupts this cycle. Whether you are wandering
+            through quiet mountain trails, listening to ocean waves, or exploring the cobbled alleys of a distant town,
+            new surroundings gently pull your attention outward. As the noise of everyday obligations fades into the
+            background, your mind finally gains the space it needs to breathe, reflect, and settle into stillness.
+          </p>
+
+          <h3 data-en="Learning the Art of Being Present" data-ml="വർത്തമാനകാലത്തിൽ ജീവിക്കാനുള്ള കല">
+            Learning the Art of Being Present
+          </h3>
+          <p data-en="True inner peace lives in the present moment—not in regrets about the past or anxieties about the future. Travel naturally anchors you in the now. When you are navigating an unfamiliar train station, tasting a dish you have never tried before, or watching a sunrise over a new horizon, your senses are fully awake. You cannot worry about next month's inbox when you are absorbed in the colors of a local market or the warmth of a conversation with a stranger. This effortless mindfulness quiets mental chatter and reminds you what it feels like to simply exist without rushing."
+            data-ml="യഥാർത്ഥ മനസ്സമാധാനം കുടികൊള്ളുന്നത് വർത്തമാനകാലത്തിലാണ്—ഭൂതകാലത്തെക്കുറിച്ചുള്ള കുറ്റബോധത്തിലോ ഭാവിയെക്കുറിച്ചുള്ള ആശങ്കകളിലോ അല്ല. യാത്രകൾ നമ്മളെ സ്വാഭാവികമായും ഈ നിമിഷത്തിൽ ഉറപ്പിച്ചു നിർത്തുന്നു. ഒരു പുതിയ റെയിൽവേ സ്റ്റേഷനിലൂടെ നടക്കുമ്പോഴോ, മുമ്പ് കഴിച്ചിട്ടില്ലാത്ത ഒരു വിഭവം രുചിക്കുമ്പോഴോ, പുതിയൊരു ചക്രവാളത്തിലെ സൂര്യോദയം കാണുമ്പോഴോ നമ്മുടെ ഇന്ദ്രിയങ്ങൾ പൂർണ്ണമായും ഉണർന്നിരിക്കുന്നു. അടുത്ത മാസത്തെ ജോലികളെക്കുറിച്ച് ആകുലപ്പെടാതെ, തിരക്കുകളില്ലാതെ ജീവിക്കാൻ യാത്രകൾ നമ്മളെ പഠിപ്പിക്കുന്നു.">
+            True inner peace lives in the present moment—not in regrets about the past or anxieties about the future.
+            Travel naturally anchors you in the now. When you are navigating an unfamiliar train station, tasting a dish
+            you have never tried before, or watching a sunrise over a new horizon, your senses are fully awake. You
+            cannot worry about next month's inbox when you are absorbed in the colors of a local market or the warmth of
+            a conversation with a stranger. This effortless mindfulness quiets mental chatter and reminds you what it
+            feels like to simply exist without rushing.
+          </p>
+
+          <h3 data-en="Letting Go of Control and Embracing Resilience"
+            data-ml="നിയന്ത്രണങ്ങൾ വിട്ടുകളയലും കരുത്താർജ്ജിക്കലും">
+            Letting Go of Control and Embracing Resilience
+          </h3>
+          <p data-en="Much of our daily stress comes from trying to control every outcome. Travel, by its very nature, refuses to follow a rigid script. Flights get delayed, maps lead to dead ends, and sudden rainstorms change afternoon plans. While these moments initially feel frustrating, they carry a quiet gift: they teach you to adapt. Each unexpected detour proves that you can handle uncertainty with grace. Over time, letting go of minor inconveniences on the road translates into emotional resilience at home, helping you face life’s larger storms with a calmer heart."
+            data-ml="എല്ലാ കാര്യങ്ങളും നമ്മുടെ നിയന്ത്രണത്തിൽ നിർത്താൻ ശ്രമിക്കുന്നതിൽ നിന്നാണ് ദൈനംദിന സമ്മർദ്ദങ്ങൾ ഉണ്ടാകുന്നത്. യാത്രകൾ ഒരിക്കലും ഒരു നിശ്ചിത തിരക്കഥ പിന്തുടരുന്നില്ല. യാത്രകൾ വൈകാം, വഴികൾ മാറാം, പെട്ടെന്നുള്ള മഴ പ്ലാനുകൾ മാറ്റിയേക്കാം. തുടക്കത്തിൽ ഇത് നിരാശ നൽകുമെങ്കിലും, സാഹചര്യങ്ങളുമായി പൊരുത്തപ്പെടാൻ ഇത് നമ്മളെ പഠിപ്പിക്കുന്നു. യാത്രയിലെ ചെറിയ അസൗകര്യങ്ങളെ പുഞ്ചിരിയോടെ നേരിടാൻ പഠിക്കുന്നത് ജീവിതത്തിലെ വലിയ പ്രതിസന്ധികളെ ശാന്തമായ മനസ്സോടെ നേരിടാൻ കരുത്ത് നൽകുന്നു.">
+            Much of our daily stress comes from trying to control every outcome. Travel, by its very nature, refuses to
+            follow a rigid script. Flights get delayed, maps lead to dead ends, and sudden rainstorms change afternoon
+            plans. While these moments initially feel frustrating, they carry a quiet gift: they teach you to adapt.
+            Each unexpected detour proves that you can handle uncertainty with grace. Over time, letting go of minor
+            inconveniences on the road translates into emotional resilience at home, helping you face life’s larger
+            storms with a calmer heart.
+          </p>
+
+          <h3 data-en="Gaining Perspective and Deep Gratitude" data-ml="പുതിയ കാഴ്ചപ്പാടും കൃതജ്ഞതയും">
+            Gaining Perspective and Deep Gratitude
+          </h3>
+          <p data-en="Seeing how differently people live across the world shifts the way you measure your own life. Stepping outside your bubble softens the weight of petty worries and highlights how little you actually need to feel content. Living out of a single backpack or suitcase shows you that happiness rarely depends on material possessions. At the same time, witnessing kindness from strangers, experiencing diverse cultures, and standing before vast natural landscapes inspire a deep sense of humility and gratitude. You begin to appreciate not only the wonders of the world, but also the simple blessings waiting for you back home."
+            data-ml="ലോകത്തിന്റെ വിവിധ ഭാഗങ്ങളിൽ ആളുകൾ എങ്ങനെ ജീവിക്കുന്നു എന്ന് കാണുന്നത് നമ്മുടെ ജീവിതത്തെ അളക്കുന്ന രീതി മാറ്റുന്നു. സന്തോഷമായിരിക്കാൻ എത്ര കുറച്ച് കാര്യങ്ങൾ മതിയെന്ന് യാത്രകൾ കാണിച്ചുതരുന്നു. ഒരൊറ്റ ബാഗുമായി യാത്ര ചെയ്യുമ്പോൾ സന്തോഷം ഭൗതിക വസ്തുക്കളിലല്ല എന്ന് നാം തിരിച്ചറിയുന്നു. അപരിചിതരുടെ സ്നേഹവും വിവിധ സംസ്കാരങ്ങളും വിശാലമായ പ്രകൃതിദൃശ്യങ്ങളും നമ്മളിൽ വിനയവും നന്ദിയും നിറയ്ക്കുന്നു. ലോകത്തിലെ അത്ഭുതങ്ങളെ മാത്രമല്ല, വീട്ടിൽ നമ്മളെ കാത്തിരിക്കുന്ന കൊച്ചു സന്തോഷങ്ങളെയും വിലമതിക്കാൻ നാം തുടങ്ങുന്നു.">
+            Seeing how differently people live across the world shifts the way you measure your own life. Stepping
+            outside your bubble softens the weight of petty worries and highlights how little you actually need to feel
+            content. Living out of a single backpack or suitcase shows you that happiness rarely depends on material
+            possessions. At the same time, witnessing kindness from strangers, experiencing diverse cultures, and
+            standing before vast natural landscapes inspire a deep sense of humility and gratitude. You begin to
+            appreciate not only the wonders of the world, but also the simple blessings waiting for you back home.
+          </p>
+
+          <h3 data-en="Reconnecting with Your Authentic Self" data-ml="യഥാർത്ഥ സ്വത്വത്തെ തിരിച്ചറിയൽ">
+            Reconnecting with Your Authentic Self
+          </h3>
+          <p data-en="Away from social expectations and familiar roles, travel gives you permission to rediscover who you are when nobody is watching. Solitude on the road—whether sitting quietly at a café or walking alone through nature—builds a comforting friendship with yourself. You learn to trust your instincts, honor your own pace, and listen to your inner voice without distraction."
+            data-ml="സാമൂഹിക പ്രതീക്ഷകളിൽ നിന്നും പതിവ് വേഷങ്ങളിൽ നിന്നും അകന്നു നിൽക്കുമ്പോൾ, നിങ്ങൾ യഥാർത്ഥത്തിൽ ആരാണെന്ന് തിരിച്ചറിയാൻ യാത്രകൾ അവസരം നൽകുന്നു. പ്രകൃതിയിലൂടെ ഒറ്റയ്ക്ക് നടക്കുമ്പോഴോ ശാന്തമായി ഇരിക്കുമ്പോഴോ ഉള്ള ഏകാന്തത നിങ്ങളുമായിത്തന്നെ ഒരു ആത്മബന്ധം വളർത്തുന്നു. സ്വന്തം മനസ്സിനെ വിശ്വസിക്കാനും നിങ്ങളുടെ വേഗതയിൽ സഞ്ചരിക്കാനും ഇത് പഠിപ്പിക്കുന്നു.">
+            Away from social expectations and familiar roles, travel gives you permission to rediscover who you are when
+            nobody is watching. Solitude on the road—whether sitting quietly at a café or walking alone through
+            nature—builds a comforting friendship with yourself. You learn to trust your instincts, honor your own pace,
+            and listen to your inner voice without distraction.
+          </p>
+
+          <h3 data-en="Conclusion" data-ml="ഉപസംഹാരം">
+            Conclusion
+          </h3>
+          <p data-en="True inner peace is not a destination stamped on a passport; it is a state of awareness you carry within. Travelling simply clears away the clutter that hides it. By slowing down, embracing the unknown, and opening your heart to new horizons, every journey becomes an inward voyage—one that brings you home to yourself, lighter and more at peace than before."
+            data-ml="യഥാർത്ഥ മനസ്സമാധാനം പാസ്‌പോർട്ടിൽ പതിപ്പിക്കുന്ന ഒരു ലക്ഷ്യസ്ഥാനമല്ല; അത് നമ്മുടെ ഉള്ളിൽത്തന്നെയുള്ള ഒരു അവസ്ഥയാണ്. അതിനെ മറച്ചുപിടിക്കുന്ന മനസ്സിലെ ഭാരങ്ങളെ നീക്കം ചെയ്യുക മാത്രമാണ് യാത്രകൾ ചെയ്യുന്നത്. വേഗത കുറച്ച്, പുതിയ ചക്രവാളങ്ങളിലേക്ക് ഹൃദയം തുറക്കുമ്പോൾ ഓരോ യാത്രയും നമ്മളെത്തന്നെ കണ്ടെത്തുന്ന ഒരു ഉൾയാത്രയായി മാറുന്നു.">
+            True inner peace is not a destination stamped on a passport; it is a state of awareness you carry within.
+            Travelling simply clears away the clutter that hides it. By slowing down, embracing the unknown, and opening
+            your heart to new horizons, every journey becomes an inward voyage—one that brings you home to yourself,
+            lighter and more at peace than before.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 2. BEST PLACES SECTION -->
+    <section id="best-places" class="section bg-light">
+      <div class="container">
+        <h2 class="section-title" data-en="Best Places to Explore" data-ml="സന്ദർശിക്കേണ്ട മികച്ച സ്ഥലങ്ങൾ">Best Places
+          to Explore</h2>
+        <p class="section-subtitle"
+          data-en="Click 'More Details' on any destination to view complete highlights, Kerala round-trip itinerary, and booking options."
+          data-ml="ഓരോ സ്ഥലത്തിന്റെയും പൂർണ്ണ വിവരങ്ങളും യാത്രാ പരിപാടിയും അറിയാൻ 'കൂടുതൽ വിവരങ്ങൾ' ക്ലിക്ക് ചെയ്യുക.">
+          Click 'More Details' on any destination to view complete highlights, Kerala round-trip itinerary, and booking
+          options.
+        </p>
+
+        <div id="placesGrid" class="places-grid"></div>
+      </div>
+    </section>
+
+    <!-- 3. ABOUT US SECTION -->
+    <section id="about" class="section about-section">
+      <div class="container about-box">
+        <img src="logo.png" alt="Suggayitt Povaa Logo" class="about-logo">
+        <h2 data-en="About Suggayitt Povaa (സുഗ്ഗായിട്ട് പോവാ)"
+          data-ml="സുഗ്ഗായിട്ട് പോവാ (Suggayitt Povaa) - ഞങ്ങളെക്കുറിച്ച്">
+          About Suggayitt Povaa (സുഗ്ഗായിട്ട് പോവാ)
+        </h2>
+        <p data-en="Born in Kerala with a passion for raw trails, mountain peaks, and stress-free exploration, Suggayitt Povaa helps students, solo backpackers, and group travellers experience India's finest destinations without burning their pockets. From misty Western Ghats weekend treks to high-altitude Himalayan snow passes, we craft transparent, safe, and budget-smart itineraries so you can travel with pure joy."
+          data-ml="യാത്രകളെയും മലനിരകളെയും സ്നേഹിക്കുന്ന ഒരു കൂട്ടം സഞ്ചാരികൾ കേരളത്തിൽ നിന്നും ആരംഭിച്ച സംരംഭമാണ് 'സുഗ്ഗായിട്ട് പോവാ'. വിദ്യാർത്ഥികൾക്കും സോളോ യാത്രികർക്കും ഗ്രൂപ്പുകൾക്കും കുറഞ്ഞ ചെലവിൽ സുരക്ഷിതമായി ഇന്ത്യയിലെ മികച്ച സ്ഥലങ്ങൾ കാണാൻ ഞങ്ങൾ അവസരമൊരുക്കുന്നു. പശ്ചിമഘട്ടത്തിലെ കോടമഞ്ഞുള്ള മലനിരകൾ മുതൽ ഹിമാലയത്തിലെ മഞ്ഞുമലകൾ വരെ യാതൊരു ടെൻഷനും ഇല്ലാതെ സുഗ്ഗായിട്ട് പോയി വരാൻ ഞങ്ങൾ കൂടെയുണ്ട്.">
+          Born in Kerala with a passion for raw trails, mountain peaks, and stress-free exploration, Suggayitt Povaa
+          helps students, solo backpackers, and group travellers experience India's finest destinations without burning
+          their pockets. From misty Western Ghats weekend treks to high-altitude Himalayan snow passes, we craft
+          transparent, safe, and budget-smart itineraries so you can travel with pure joy.
+        </p>
+
+        <div class="contact-cards">
+          <a href="tel:+917012274317" class="contact-item">
+            <span class="contact-label" data-en="Call / WhatsApp Us" data-ml="വിളിക്കാം / വാട്സാപ്പ്">Call / WhatsApp
+              Us</span>
+            <strong>+91 70122 74317</strong>
+          </a>
+          <a href="mailto:suggayittpova@gmail.com" class="contact-item">
+            <span class="contact-label" data-en="Email Us" data-ml="ഇമെയിൽ അയക്കാം">Email Us</span>
+            <strong>suggayittpova@gmail.com</strong>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- DEDICATED PACKAGES PAGE -->
+  <section id="packagesPageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <h2 class="section-title" data-en="Budget-Friendly Packages (From Kerala & Return)"
+        data-ml="ബജറ്റ് ഫ്രണ്ട്‌ലി പാക്കേജുകൾ (കേരളത്തിൽ നിന്ന് പോയി വരാൻ)">
+        Budget-Friendly Packages (From Kerala & Return)
+      </h2>
+      <p class="section-subtitle"
+        data-en="Click 'More Details' on any package to view complete itinerary, highlights, and booking options."
+        data-ml="ഓരോ പാക്കേജിന്റെയും പൂർണ്ണ വിവരങ്ങളും ബുക്കിംഗ് സൗകര്യവും അറിയാൻ 'കൂടുതൽ വിവരങ്ങൾ' ക്ലിക്ക് ചെയ്യുക.">
+        Click 'More Details' on any package to view complete itinerary, highlights, and booking options.
+      </p>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all" data-en="All Packages (21)"
+          data-ml="എല്ലാ പാക്കേജുകളും (21)">All Packages (21)</button>
+        <button class="filter-btn" data-filter="kerala" data-en="Kerala & South India"
+          data-ml="കേരളം & സൗത്ത് ഇന്ത്യ">Kerala & South India</button>
+        <button class="filter-btn" data-filter="west" data-en="West & Central India"
+          data-ml="മഹാരാഷ്ട്ര & ഹൈദരാബാദ്">West & Central India</button>
+        <button class="filter-btn" data-filter="himalayas" data-en="Himalayas & North"
+          data-ml="ഹിമാലയം & നോർത്ത് ഇന്ത്യ">Himalayas & North</button>
+
+        <div class="catalog-sort-box">
+          <label for="catalogSortSelect" data-en="Sort:" data-ml="ക്രമം:">Sort:</label>
+          <select id="catalogSortSelect" class="catalog-sort-select" onchange="handleSortChange(this.value)">
+            <option value="default" data-en="Default" data-ml="ഡിഫോൾട്ട്">Default</option>
+            <option value="price_asc" data-en="Price: Low to High" data-ml="വില: കുറഞ്ഞത് ആദ്യം">Price: Low to High
+            </option>
+            <option value="price_desc" data-en="Price: High to Low" data-ml="വില: കൂടിയത് ആദ്യം">Price: High to Low
+            </option>
+            <option value="altitude_desc" data-en="Altitude: High Peaks" data-ml="ഉയരം: ഉയർന്നത് ആദ്യം">Altitude: High
+              Peaks</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="packagesList" class="packages-list"></div>
+    </div>
+  </section>
+
+  <!-- DEDICATED STORE PAGE -->
+  <section id="storePageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <h2 class="section-title" data-en="Suggayitt Povaa Adventure Store" data-ml="സുഗ്ഗായിട്ട് പോവാ അഡ്വഞ്ചർ സ്റ്റോർ">
+        Suggayitt Povaa Adventure Store
+      </h2>
+      <p class="section-subtitle"
+        data-en="Click 'More Details' on any gear to read full specifications, trail necessity, and order options."
+        data-ml="ഓരോ ഗിയറിന്റെയും പൂർണ്ണ വിവരങ്ങളും ഓർഡർ സൗകര്യവും അറിയാൻ 'കൂടുതൽ വിവരങ്ങൾ' ക്ലിക്ക് ചെയ്യുക.">
+        Click 'More Details' on any gear to read full specifications, trail necessity, and order options.
+      </p>
+
+      <div id="storeGrid" class="gears-grid"></div>
+    </div>
+  </section>
+
+  <!-- DEDICATED STUDIO PAGE (FEATURED EDITING & SHOOTING) -->
+  <section id="studioPageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <h2 class="section-title" data-en="Featured Editing & Shooting" data-ml="ഫീച്ചേർഡ് എഡിറ്റിംഗ് & ഷൂട്ടിംഗ്">
+        Featured Editing & Shooting
+      </h2>
+      <p class="section-subtitle"
+        data-en="Practical courses and professional tips on Video Editing, Photo Editing, Video Shot, and Photo Shot."
+        data-ml="വീഡിയോ എഡിറ്റിംഗ്, ഫോട്ടോ എഡിറ്റിംഗ്, വീഡിയോ ഷോട്ട്, ഫോട്ടോ ഷോട്ട് എന്നിവയിലെ കോഴ്സുകളും അറിവുകളും.">
+        Practical courses and professional tips on Video Editing, Photo Editing, Video Shot, and Photo Shot.
+      </p>
+
+      <div id="coursesGrid" class="gears-grid"></div>
+
+      <div class="knowledge-wrapper">
+        <h2 class="section-title" data-en="Editing & Shooting Knowledge Hub"
+          data-ml="എഡിറ്റിംഗ് & ഷൂട്ടിംഗ് അറിവുകളും വസ്തുതകളും">
+          Editing & Shooting Knowledge Hub
+        </h2>
+        <p class="section-subtitle"
+          data-en="Essential facts, camera rules, and editing workflows for Video Editing, Photo Editing, Video Shot, and Photo Shot."
+          data-ml="വീഡിയോ എഡിറ്റിംഗ്, ഫോട്ടോ എഡിറ്റിംഗ്, വീഡിയോ ഷോട്ട്, ഫോട്ടോ ഷോട്ട് എന്നിവയിലെ പ്രധാന അറിവുകളും നിയമങ്ങളും.">
+          Essential facts, camera rules, and editing workflows for Video Editing, Photo Editing, Video Shot, and Photo
+          Shot.
+        </p>
+
+        <div id="knowledgeGrid" class="knowledge-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEDICATED DISCOVER & LEARN PAGE (അറിയാം, പഠിക്കാം) -->
+  <section id="discoverPageView" class="section page-view hidden">
+    <div class="container discover-container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <!-- Cinematic Mountain Hero Banner -->
+      <div class="discover-hero-card">
+        <div class="discover-hero-glow"></div>
+        <div class="discover-hero-content">
+          <span class="discover-badge" data-en="Mountain Heritage & Exploration Lore"
+            data-ml="പർവ്വത ചരിത്രവും വിജ്ഞാനവും">Mountain Heritage & Exploration Lore</span>
+          <h1 class="discover-hero-title" data-en="Discover the World Beyond the Mountains"
+            data-ml="മലനിരകൾക്കപ്പുറമുള്ള ലോകം കണ്ടെത്താം">
+            Discover the World Beyond the Mountains
+          </h1>
+          <p class="discover-hero-sub"
+            data-en="Explore legendary mountaineers, iconic peaks, historic expeditions, and extraordinary destinations."
+            data-ml="പ്രശസ്ത പർവ്വതാരോഹകർ, ഇതിഹാസ കൊടുമുടികൾ, ചരിത്ര പര്യവേഷണങ്ങൾ, വിസ്മയിപ്പിക്കുന്ന ഭൂമിശാസ്ത്രങ്ങൾ.">
+            Explore legendary mountaineers, iconic peaks, historic expeditions, and extraordinary destinations.
+          </p>
+
+          <div class="discover-stats-row">
+            <div class="discover-stat">
+              <strong>12</strong>
+              <span data-en="Popular Mountaineers" data-ml="പർവ്വതാരോഹകർ">Popular Mountaineers</span>
+            </div>
+            <div class="discover-stat">
+              <strong>14 + 7</strong>
+              <span data-en="Peaks (8000m & Summits)" data-ml="കൊടുമുടികൾ">Peaks (8000m & Summits)</span>
+            </div>
+            <div class="discover-stat">
+              <strong>34</strong>
+              <span data-en="Historical Places" data-ml="ചരിത്ര സ്ഥലങ്ങൾ">Historical Places</span>
+            </div>
+            <div class="discover-stat">
+              <strong>6</strong>
+              <span data-en="Mountain Knowledge Topics" data-ml="വിജ്ഞാന വിഷയങ്ങൾ">Mountain Knowledge Topics</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISCOVER NAVIGATION TABS (The 4 Main Categories) -->
+      <div class="discover-nav-tabs-wrapper">
+        <div class="discover-nav-tabs">
+          <button type="button" class="discover-nav-tab active" data-dtab="hub" onclick="switchDiscoverTab('hub')">
+            <span class="dtab-icon">🏠</span>
+            <span data-en="Hub Overview" data-ml="പ്രധാന വിഭാഗങ്ങൾ">Hub Overview</span>
+          </button>
+          <button type="button" class="discover-nav-tab" data-dtab="mountaineers"
+            onclick="switchDiscoverTab('mountaineers')">
+            <span class="dtab-icon">🧗‍♂️</span>
+            <span data-en="1. POPULAR MOUNTAINEERS" data-ml="1. ജനപ്രിയ പർവ്വതാരോഹകർ">1. POPULAR MOUNTAINEERS</span>
+          </button>
+          <button type="button" class="discover-nav-tab" data-dtab="peaks" onclick="switchDiscoverTab('peaks')">
+            <span class="dtab-icon">🏔️</span>
+            <span data-en="2. PEAKS" data-ml="2. കൊടുമുടികൾ">2. PEAKS</span>
+          </button>
+          <button type="button" class="discover-nav-tab" data-dtab="history" onclick="switchDiscoverTab('history')">
+            <span class="dtab-icon">🏛️</span>
+            <span data-en="3. HISTORICAL BACKGROUND" data-ml="3. ചരിത്ര പശ്ചാത്തലം">3. HISTORICAL BACKGROUND</span>
+          </button>
+          <button type="button" class="discover-nav-tab" data-dtab="knowledge" onclick="switchDiscoverTab('knowledge')">
+            <span class="dtab-icon">📖</span>
+            <span data-en="4. MOUNTAIN KNOWLEDGE" data-ml="4. പർവ്വത വിജ്ഞാനം">4. MOUNTAIN KNOWLEDGE</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 0: MAIN DISCOVER HUB (THE FOUR MAIN CATEGORY CARDS) -->
+      <div id="discoverSection-hub" class="discover-section-panel">
+        <div class="discover-categories-grid">
+          <!-- Category 1 -->
+          <div class="discover-category-card" onclick="switchDiscoverTab('mountaineers')">
+            <div class="dcat-img-box">
+              <img src="images/discover/mountaineers/nirmal-purja.jpg" alt="Popular Mountaineers" class="dcat-img">
+              <span class="dcat-num">01</span>
+            </div>
+            <div class="dcat-body">
+              <span class="dcat-tag" data-en="12 Biographies & Lore" data-ml="12 ജീവിതചരിത്രങ്ങൾ">12 Biographies &
+                Lore</span>
+              <h3 data-en="POPULAR MOUNTAINEERS" data-ml="ജനപ്രിയ പർവ്വതാരോഹകർ">POPULAR MOUNTAINEERS</h3>
+              <p data-en="Explore 12 legendary mountaineers who conquered the impossible: Nirmal Purja (Nimsdai), Tenzing Norgay, Edmund Hillary, Reinhold Messner, Bachendri Pal, Junko Tabei, Kami Rita Sherpa, and more."
+                data-ml="നിർമൽ പുർജ, ടെൻസിങ് നോർഗെ, എഡ്മണ്ട് ഹിലാരി, മെസ്നർ, ബച്ചേന്ദ്രി പാൽ, ജുങ്കോ താബെയ് തുടങ്ങിയ 12 ഇതിഹാസ പർവ്വതാരോഹകരുടെ സമഗ്ര ജീവിതരേഖ.">
+                Explore 12 legendary mountaineers who conquered the impossible: Nirmal Purja (Nimsdai), Tenzing Norgay,
+                Edmund Hillary, Reinhold Messner, Bachendri Pal, Junko Tabei, Kami Rita Sherpa, and more.
+              </p>
+              <button type="button" class="dcat-btn" data-en="Explore Mountaineers →"
+                data-ml="പർവ്വതാരോഹകരെ അറിയാം →">Explore Mountaineers →</button>
+            </div>
+          </div>
+
+          <!-- Category 2 -->
+          <div class="discover-category-card" onclick="switchDiscoverTab('peaks')">
+            <div class="dcat-img-box">
+              <img src="images/discover/peaks/mount-everest.jpg" alt="Peaks" class="dcat-img">
+              <span class="dcat-num">02</span>
+            </div>
+            <div class="dcat-body">
+              <span class="dcat-tag" data-en="14 Peaks & Seven Summits" data-ml="14 കൊടുമുടികളും സെവൻ സമ്മിറ്റ്സും">14
+                Peaks & Seven Summits</span>
+              <h3 data-en="PEAKS" data-ml="കൊടുമുടികൾ">PEAKS</h3>
+              <p data-en="The world above 8,000 meters and the Seven Summits of seven continents. Featuring Project Possible 2019 timeline and Bass vs Messner continental comparison."
+                data-ml="ലോകത്തിലെ 14 എണ്ണായിരം മീറ്റർ കൊടുമുടികളും ഏഴ് ഭൂഖണ്ഡങ്ങളിലെ സെവൻ സമ്മിറ്റ്സും. പ്രൊജക്റ്റ് പോസിബിൾ ടൈംലൈനും മാപ്പും.">
+                The world above 8,000 meters and the Seven Summits of seven continents. Featuring Project Possible 2019
+                timeline and Bass vs Messner continental comparison.
+              </p>
+              <button type="button" class="dcat-btn" data-en="Explore Peaks →" data-ml="കൊടുമുടികൾ കാണാം →">Explore
+                Peaks →</button>
+            </div>
+          </div>
+
+          <!-- Category 3 -->
+          <div class="discover-category-card" onclick="switchDiscoverTab('history')">
+            <div class="dcat-img-box">
+              <img src="images/discover/history/hampi.jpg" alt="Historical Background" class="dcat-img">
+              <span class="dcat-num">03</span>
+            </div>
+            <div class="dcat-body">
+              <span class="dcat-tag" data-en="34 Indian Heritage Places" data-ml="34 ചരിത്ര സ്മാരകങ്ങൾ">34 Indian
+                Heritage Places</span>
+              <h3 data-en="HISTORICAL BACKGROUND" data-ml="ചരിത്ര പശ്ചാത്തലം">HISTORICAL BACKGROUND</h3>
+              <p data-en="Deep heritage, origins, dynasties, and monuments of famous places across Kerala, Karnataka, Tamil Nadu, Rajasthan, Himachal Pradesh, Ladakh, and more."
+                data-ml="കേരളം, കർണാടക, തമിഴ്‌നാട്, രാജസ്ഥാൻ, ഹിമാചൽ, ലഡാക്ക് എന്നിവിടങ്ങളിലെ പ്രശസ്ത വിനോദസഞ്ചാര കേന്ദ്രങ്ങളുടെ പുരാതന ചരിത്രവും പൈതൃകവും.">
+                Deep heritage, origins, dynasties, and monuments of famous places across Kerala, Karnataka, Tamil Nadu,
+                Rajasthan, Himachal Pradesh, Ladakh, and more.
+              </p>
+              <button type="button" class="dcat-btn" data-en="Explore History & Heritage →"
+                data-ml="ചരിത്ര പശ്ചാത്തലം വായിക്കാം →">Explore History & Heritage →</button>
+            </div>
+          </div>
+
+          <!-- Category 4 -->
+          <div class="discover-category-card" onclick="switchDiscoverTab('knowledge')">
+            <div class="dcat-img-box">
+              <img src="images/discover/peaks/k2.jpg" alt="Mountain Knowledge" class="dcat-img">
+              <span class="dcat-num">04</span>
+            </div>
+            <div class="dcat-body">
+              <span class="dcat-tag" data-en="6 Essential Mountain Guides" data-ml="6 വിജ്ഞാന ശാഖകൾ">6 Essential
+                Mountain Guides</span>
+              <h3 data-en="MOUNTAIN KNOWLEDGE" data-ml="പർവ്വത വിജ്ഞാനം">MOUNTAIN KNOWLEDGE</h3>
+              <p data-en="18 Essential trekking gears (linked to store), tectonic mountain geography, mountain weather & jet streams, AMS/HAPE/HACE altitude sickness, LNT safety, and wilderness first aid."
+                data-ml="18 ട്രെക്കിംഗ് ഉപകരണങ്ങൾ, പർവ്വത രൂപീകരണം, കാലാവസ്ഥാ വ്യതിയാനങ്ങൾ, ആൾട്ടിറ്റ്യൂഡ് സിക്ക്നസ്, ട്രെക്കിംഗ് സുരക്ഷ, പ്രഥമശുശ്രൂഷ.">
+                18 Essential trekking gears (linked to store), tectonic mountain geography, mountain weather & jet
+                streams, AMS/HAPE/HACE altitude sickness, LNT safety, and wilderness first aid.
+              </p>
+              <button type="button" class="dcat-btn" data-en="Explore Mountain Knowledge →"
+                data-ml="പർവ്വത വിജ്ഞാനം പഠിക്കാം →">Explore Mountain Knowledge →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 1: POPULAR MOUNTAINEERS -->
+      <div id="discoverSection-mountaineers" class="discover-section-panel hidden">
+        <div class="section-top-actions">
+          <button type="button" class="btn-sub-back" onclick="switchDiscoverTab('hub')">
+            <span data-en="← Back to Discover Categories" data-ml="← പ്രധാന വിഭാഗങ്ങളിലേക്ക്">← Back to Discover
+              Categories</span>
+          </button>
+        </div>
+        <!-- Spotlight on Nimsdai -->
+        <div id="nimsdaiSpotlight" class="nimsdai-spotlight-card"></div>
+        <!-- Mountaineers Grid -->
+        <div id="mountaineersGrid" class="mountaineers-grid"></div>
+      </div>
+
+      <!-- VIEW 2: PEAKS -->
+      <div id="discoverSection-peaks" class="discover-section-panel hidden">
+        <div class="section-top-actions">
+          <button type="button" class="btn-sub-back" onclick="switchDiscoverTab('hub')">
+            <span data-en="← Back to Discover Categories" data-ml="← പ്രധാന വിഭാഗങ്ങളിലേക്ക്">← Back to Discover
+              Categories</span>
+          </button>
+        </div>
+        <!-- Peaks Sub-Tabs: A. 14 Peaks vs B. 7 Peaks -->
+        <div class="peaks-subnav-bar">
+          <button type="button" class="peaks-subnav-btn active" data-ptab="14peaks"
+            onclick="switchPeaksSubTab('14peaks')">
+            🏔️ <span data-en="A. 14 PEAKS (The Eight-Thousanders)" data-ml="A. 14 കൊടുമുടികൾ (8000 മീറ്റർ)">A. 14 PEAKS
+              (The Eight-Thousanders)</span>
+          </button>
+          <button type="button" class="peaks-subnav-btn" data-ptab="7summits" onclick="switchPeaksSubTab('7summits')">
+            🌍 <span data-en="B. 7 PEAKS (Seven Summits Challenge)" data-ml="B. 7 കൊടുമുടികൾ (സെവൻ സമ്മിറ്റ്സ്)">B. 7
+              PEAKS (Seven Summits Challenge)</span>
+          </button>
+        </div>
+        <div id="peaksSubView-14peaks"></div>
+        <div id="peaksSubView-7summits" class="hidden"></div>
+      </div>
+
+      <!-- VIEW 3: HISTORICAL BACKGROUND -->
+      <div id="discoverSection-history" class="discover-section-panel hidden">
+        <div class="section-top-actions">
+          <button type="button" class="btn-sub-back" onclick="switchDiscoverTab('hub')">
+            <span data-en="← Back to Discover Categories" data-ml="← പ്രധാന വിഭാഗങ്ങളിലേക്ക്">← Back to Discover
+              Categories</span>
+          </button>
+        </div>
+        <!-- State Filter Bar -->
+        <div class="history-state-filter-bar" id="historyStateFilterBar"></div>
+        <!-- Historical Places Grid -->
+        <div id="historyGrid" class="history-grid"></div>
+      </div>
+
+      <!-- VIEW 4: MOUNTAIN KNOWLEDGE -->
+      <div id="discoverSection-knowledge" class="discover-section-panel hidden">
+        <div class="section-top-actions">
+          <button type="button" class="btn-sub-back" onclick="switchDiscoverTab('hub')">
+            <span data-en="← Back to Discover Categories" data-ml="← പ്രധാന വിഭാഗങ്ങളിലേക്ക്">← Back to Discover
+              Categories</span>
+          </button>
+        </div>
+        <!-- Knowledge Sub-Topic Tabs -->
+        <div class="knowledge-tabs-bar" id="knowledgeTabsBar"></div>
+        <div id="knowledgeTopicContent" class="knowledge-topic-content"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCOVER DETAILED READING MODAL (Full 14-point articles) -->
+  <!-- DISCOVER COMPACT POPUP MODAL (DARK LIQUID GLASS) -->
+  <div id="discoverModal" class="compact-modal-backdrop hidden" onclick="closeDiscoverOnBackdrop(event)">
+    <div class="compact-discover-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <button type="button" class="compact-modal-close-btn" onclick="closeDiscoverModal()" aria-label="Close">×</button>
+      <div id="discoverModalContent" class="compact-modal-inner"></div>
+    </div>
+  </div>
+
+  <!-- DEDICATED USER PROFILE DASHBOARD (4 SECTIONS) -->
+  <section id="profilePageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <div class="profile-header-glass">
+        <div class="profile-avatar" id="profileAvatarInitial">U</div>
+        <div class="profile-meta">
+          <h2 id="profileUserName">Traveller Name</h2>
+          <p id="profileUserContact">email@example.com • +91 0000000000</p>
+        </div>
+      </div>
+
+      <!-- 4 Profile Tabs -->
+      <div class="profile-tabs-bar">
+        <button type="button" class="profile-tab-btn active" data-ptab="cart" onclick="switchProfileTab('cart')"
+          data-en="1. Cart (Gears)" data-ml="1. കാർട്ട് (ഗിയറുകൾ)">1. Cart (Gears)</button>
+        <button type="button" class="profile-tab-btn" data-ptab="packages" onclick="switchProfileTab('packages')"
+          data-en="2. Saved Packages" data-ml="2. സേവ് ചെയ്ത പാക്കേജുകൾ">2. Saved Packages</button>
+        <button type="button" class="profile-tab-btn" data-ptab="courses" onclick="switchProfileTab('courses')"
+          data-en="3. Saved Courses" data-ml="3. സേവ് ചെയ്ത കോഴ്സുകൾ">3. Saved Courses</button>
+        <button type="button" class="profile-tab-btn" data-ptab="history" onclick="switchProfileTab('history')"
+          data-en="4. Active & Buy History" data-ml="4. ബുക്കിംഗുകളും ഹിസ്റ്ററിയും">4. Active & Buy History</button>
+      </div>
+
+      <!-- Profile Tab Dynamic Content -->
+      <div id="profileTabContent" class="profile-tab-panel"></div>
+    </div>
+  </section>
+
+  <!-- DEDICATED INDIVIDUAL DETAILS PAGE -->
+  <section id="detailsPageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar" id="detailsBackBar"></div>
+      <div id="detailsContent" class="details-glass-box"></div>
+    </div>
+  </section>
+
+  <!-- DEDICATED NOT FOUND & SUGGESTION PAGE -->
+  <section id="notFoundPageView" class="section page-view hidden">
+    <div class="container">
+      <div class="page-top-bar">
+        <button type="button" class="btn-back" onclick="showMainView('home')" data-en="← Back to Home"
+          data-ml="← ഹോമിലേക്ക് മടങ്ങുക">← Back to Home</button>
+      </div>
+
+      <div class="details-glass-box not-found-box">
+        <span class="details-badge" data-en="Not Listed Yet" data-ml="നിലവിൽ ലഭ്യമല്ല">Not Listed Yet</span>
+        <h2 class="details-title" id="notFoundHeading" data-en="Sorry, we couldn't find that!"
+          data-ml="ക്ഷമിക്കണം, നിങ്ങൾ തിരഞ്ഞത് കണ്ടെത്താനായില്ല!">
+          Sorry, we couldn't find that!
+        </h2>
+        <p class="not-found-text" id="notFoundMessage"
+          data-en="We apologize! The place, gear, or course you searched for isn't listed on Suggayitt Povaa right now. Tell us what you'd love to see next—we always listen to our travellers & creators!"
+          data-ml="ക്ഷമിക്കണം! നിങ്ങൾ തിരഞ്ഞ സ്ഥലമോ ഗിയറോ കോഴ്സോ നിലവിൽ ഞങ്ങളുടെ വെബ്സൈറ്റിൽ ഉൾപ്പെടുത്തിയിട്ടില്ല. നിങ്ങളുടെ നിർദ്ദേശങ്ങളും അഭിപ്രായങ്ങളും താഴെ പങ്കുവെക്കൂ!">
+          We apologize! The place, gear, or course you searched for isn't listed on Suggayitt Povaa right now. Tell us
+          what you'd love to see next—we always listen to our travellers & creators!
+        </p>
+
+        <div class="suggestion-card">
+          <h3 data-en="Share Your Suggestion or Opinion" data-ml="നിങ്ങളുടെ നിർദ്ദേശങ്ങളും അഭിപ്രായങ്ങളും പങ്കുവെക്കാം">
+            Share Your Suggestion or Opinion
+          </h3>
+          <textarea id="suggestionInput" rows="4"
+            placeholder="Write the place, gear, course, or feedback you want us to add..."
+            data-placeholder-en="Write the place, gear, course, or feedback you want us to add..."
+            data-placeholder-ml="നിങ്ങൾ ആഗ്രഹിക്കുന്ന സ്ഥലം, ഗിയർ, കോഴ്സ് അല്ലെങ്കിൽ അഭിപ്രായം ഇവിടെ എഴുതുക..."></textarea>
+
+          <div class="details-action-bar" style="justify-content: center;">
+            <button type="button" class="btn-whatsapp" onclick="submitSuggestion('whatsapp')"
+              data-en="Send Suggestion on WhatsApp" data-ml="വാട്സാപ്പിലൂടെ അയക്കുക">
+              Send Suggestion on WhatsApp
+            </button>
+            <button type="button" class="btn-outline" onclick="submitSuggestion('email')" data-en="Send via Email"
+              data-ml="ഇമെയിലിലൂടെ അയക്കുക">
+              Send via Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 സുഗ്ഗായിട്ട് പോവാ | Suggayitt Povaa. All rights reserved. | +91 7012274317 | suggayittpova@gmail.com</p>
+  </footer>
+
+    <!-- Supabase Official JS SDK & Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-db.js"></script>
+  <script src="imageMapping.js"></script>
+  <script src="discoverData.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

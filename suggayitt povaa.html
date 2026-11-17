@@ -107,6 +107,9 @@
         <label data-en="Password" data-ml="പാസ്‌വേഡ്">Password</label>
         <input type="password" id="loginPassword" required placeholder="Enter your password"
           data-placeholder-en="Enter your password" data-placeholder-ml="നിങ്ങളുടെ പാസ്‌വേഡ് നൽകുക">
+        <div style="display:flex; justify-content:flex-end; margin-top:-0.4rem; margin-bottom:0.9rem;">
+          <a href="#" onclick="switchAuthTab('forgot'); return false;" class="auth-forgot-link" data-en="Forgot password?" data-ml="പാസ്‌വേഡ് മറന്നുപോയോ?">Forgot password?</a>
+        </div>
 
         <button type="submit" class="btn-details auth-submit-btn" data-en="Log In Now" data-ml="ലോഗിൻ ചെയ്യുക">Log In
           Now</button>
@@ -151,6 +154,42 @@
           <a href="#" onclick="switchAuthTab('login'); return false;" data-en="Log In here"
             data-ml="ഇവിടെ ലോഗിൻ ചെയ്യുക">Log In here</a>
         </p>
+      </form>
+      <!-- FORGOT PASSWORD FORM -->
+      <form id="forgotForm" class="auth-form hidden" onsubmit="handleForgotPasswordSubmit(event)">
+        <h3 data-en="Reset Password" data-ml="പാസ്‌വേഡ് റീസെറ്റ് ചെയ്യുക">Reset Password</h3>
+        <p class="auth-sub" data-en="Enter your registered email and we'll send you a password reset link."
+          data-ml="നിങ്ങളുടെ ഇമെയിൽ നൽകുക, പാസ്‌വേഡ് മാറ്റാനുള്ള ലിങ്ക് ഞങ്ങൾ അയച്ചുതരാം.">
+          Enter your registered email and we'll send you a password reset link.
+        </p>
+
+        <label data-en="Email Address" data-ml="ഇമെയിൽ വിലാസം">Email Address</label>
+        <input type="email" id="forgotEmail" required placeholder="you@example.com"
+          data-placeholder-en="you@example.com" data-placeholder-ml="നിങ്ങളുടെ ഇമെയിൽ നൽകുക">
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Send Reset Link"
+          data-ml="റീസെറ്റ് ലിങ്ക് അയക്കുക">Send Reset Link</button>
+
+        <p class="auth-switch-hint">
+          <a href="#" onclick="switchAuthTab('login'); return false;" data-en="← Back to Log In"
+            data-ml="← ലോഗിനിലേക്ക് മടങ്ങുക">← Back to Log In</a>
+        </p>
+      </form>
+
+      <!-- UPDATE PASSWORD FORM (RECOVERY) -->
+      <form id="updatePasswordForm" class="auth-form hidden" onsubmit="handleUpdatePasswordSubmit(event)">
+        <h3 data-en="Set New Password" data-ml="പുതിയ പാസ്‌വേഡ് നൽകുക">Set New Password</h3>
+        <p class="auth-sub" data-en="Enter your new secure password below."
+          data-ml="നിങ്ങളുടെ പുതിയ പാസ്‌വേഡ് താഴെ നൽകുക.">
+          Enter your new secure password below.
+        </p>
+
+        <label data-en="New Password" data-ml="പുതിയ പാസ്‌വേഡ്">New Password</label>
+        <input type="password" id="newPasswordInput" minlength="6" required placeholder="Minimum 6 characters"
+          data-placeholder-en="Minimum 6 characters" data-placeholder-ml="കുറഞ്ഞത് 6 അക്ഷരങ്ങൾ">
+
+        <button type="submit" class="btn-details auth-submit-btn" data-en="Save New Password"
+          data-ml="പുതിയ പാസ്‌വേഡ് സേവ് ചെയ്യുക">Save New Password</button>
       </form>
     </div>
   </div>
@@ -832,6 +871,10 @@
     <p>© 2026 സുഗ്ഗായിട്ട് പോവാ | Suggayitt Povaa. All rights reserved. | +91 7012274317 | suggayittpova@gmail.com</p>
   </footer>
 
+    <!-- Supabase Official JS SDK & Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-db.js"></script>
   <script src="imageMapping.js"></script>
   <script src="discoverData.js"></script>
   <script src="script.js"></script>
